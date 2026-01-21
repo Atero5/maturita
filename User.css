@@ -23,7 +23,9 @@ body {
     margin: 0;
     padding: 0;
 }
-
+.menu button{
+    border: none;
+}
 .menu li {
     margin-left: 20px;
 }

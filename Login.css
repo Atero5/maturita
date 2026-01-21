@@ -13,6 +13,8 @@
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 }
 
+
+
 .btn_green{
     font-weight: bold;
     color: white;
@@ -22,8 +24,14 @@
     border-radius: 30px;
     font-family: 'Inter', sans-serif;
     flex-shrink: 0;
+    border: none;
 }
 
 .link{
     color: darkgray;
+}
+
+.link a {
+    text-decoration: none;
+    
 }
