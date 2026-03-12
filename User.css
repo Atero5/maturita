@@ -3,42 +3,57 @@ body {
     font-family: Arial, sans-serif;
 }
 
+/* NAVBAR */
 .navbar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    background-color: blue;
-    padding: 10px 20px;
+    align-items: stretch;
+    background-color: #3498db;
+    padding-left: 20px;
+    height: 50px;
 }
 
+/* LOGO */
 .logo {
     color: white;
     font-weight: bold;
     font-size: 20px;
+    display: flex;
+    align-items: center;
 }
 
+/* MENU */
 .menu {
     list-style: none;
     display: flex;
     margin: 0;
     padding: 0;
 }
-.menu button{
-    border: none;
-}
+
 .menu li {
-    margin-left: 20px;
+    height: 100%;
 }
 
-.menu a {
+/* TLAČÍTKA V MENU */
+.menu button {
     color: white;
-    text-decoration: none;
+    background-color: #3498db;
+    border: none;
+    height: 100%;
+    padding: 0 20px;
+    cursor: pointer;
 }
 
-.menu a:hover {
-    text-decoration: underline;
+.menu button:hover {
+    background-color: #2980b9;
 }
 
+/* SVISLÁ ČÁRA MEZI TLAČÍTKY */
+.menu li {
+    border-left: 1px solid white;
+}
+
+/* SEARCH BOX */
 .search-box {
     display: flex;
     align-items: center;
@@ -54,12 +69,8 @@ body {
 .search-box button {
     padding: 6px 10px;
     border: none;
-    background-color: #555;
+    background-color: #4CAF50;
     color: white;
     cursor: pointer;
     border-radius: 0 4px 4px 0;
-}
-
-.search-box button:hover {
-    background-color: #777;
 }

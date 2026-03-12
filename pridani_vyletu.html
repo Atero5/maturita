@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="User.css">
+    <link rel="stylesheet" href="Hidden.css">
+</head>
+<body>
+    <nav class="navbar">
+    <div class="logo">VÝLETOS</div>
+    <div class="search-box">
+        <input type="text" placeholder="Vyhledejte výlet...">
+        <button>hledat</button>
+    </div>
+
+    <ul class="menu">
+        <li><button>Moje výlety</button></li>
+        <li><button>Oblíbené výlety</button></li>
+        <li><button>přihlášen jako</button></li>
+    </ul>
+    </nav>
+
+    <h1>Přidání výletu</h1>
+    <h2>Základní informace</h2>
+    <h3>Název výletu</h3>
+    <input type="text" placeholder="Zadejte název...">
+    <h3>Adresa ubytování</h3>
+    <input type="text" placeholder="Zadejte adresu...">
+    <h3>Délka pobitu</h3>
+    <input type="text" placeholder="Zadejte délku...">
+
+    
+    <h2>Doprava tam</h2>
+    <h3>Místo odjezdu</h3>
+    <input type="text" placeholder="Zadejte místo...">
+    <h3>čas odjezdu</h3>
+    <input type="text" placeholder="Zadejte čas...">
+    <h3>Dopravní prostředek</h3>
+    <input type="text" placeholder="Zadejte prostředek...">
+
+    <h2>Doprava zpět</h2>
+    <h3>Místo odjezdu</h3>
+    <input type="text" placeholder="Zadejte místo...">
+    <h3>Čas odjezdu</h3>
+    <input type="text" placeholder="Zadejte čas...">
+    <h3>Dopravní prostředek</h3>
+    <input type="text" placeholder="Zadejte prostředek...">
+
+    <h3>Stravování</h3>
+
+    <h3>Snídaně</h3>
+    <label>
+    <input type="radio" name="BreakfastType" value="restaurace" data-target="BreakfastBox"> restaurace
+    </label><br>
+    <label>
+    <input type="radio" name="BreakfastType" value="vlastni"> vlastní
+    </label>
+
+    <div id="BreakfastBox" class="hidden">
+    <h3>Název restaurace</h3>
+    <input type="text" placeholder="Zadejte restauraci...">
+    <h3>Adresa restaurace</h3>
+    <input type="text" placeholder="Zadejte adresu...">
+    <h3>Čas snídaně</h3>
+    <input type="text" placeholder="Zadejte čas...">
+    </div>
+
+
+    <h3>Oběd</h3>
+    <label>
+    <input type="radio" name="LunchType" value="restaurace" data-target="LunchBox"> restaurace
+    </label><br>
+    <label>
+    <input type="radio" name="LunchType" value="vlastni"> vlastní
+    </label>
+
+    <div id="LunchBox" class="hidden">
+    <h3>Název restaurace</h3>
+    <input type="text" placeholder="Zadejte restauraci...">
+    <h3>Adresa restaurace</h3>
+    <input type="text" placeholder="Zadejte adresu...">
+    <h3>Čas oběda</h3>
+    <input type="text" placeholder="Zadejte čas...">
+    </div>
+
+
+    <h3>Večeře</h3>
+    <label>
+    <input type="radio" name="DinnerType" value="restaurace" data-target="DinnerBox"> restaurace
+    </label><br>
+    <label>
+    <input type="radio" name="DinnerType" value="vlastni"> vlastní
+    </label>
+
+    <div id="DinnerBox" class="hidden">
+    <h3>Název restaurace</h3>
+    <input type="text" placeholder="Zadejte restauraci...">
+    <h3>Adresa restaurace</h3>
+    <input type="text" placeholder="Zadejte adresu...">
+    <h3>Čas večeře</h3>
+    <input type="text" placeholder="Zadejte čas...">
+    </div>
+
+    <h2>Cena</h2>
+    <h3>Celková cena</h3>
+    <input type="text" placeholder="Zadejte cenu...">
+    <h3>Číslo účtu</h3>
+    <input type="text" placeholder="Zadejte číslo účtu...">
+
+
+
+<script>
+
+const radios = document.querySelectorAll("input[type=radio]");
+
+radios.forEach(radio => {
+
+    radio.addEventListener("change", function(){
+
+        const group = document.querySelectorAll(`input[name="${this.name}"]`);
+
+        group.forEach(r => {
+            if(r.dataset.target){
+                document.getElementById(r.dataset.target).classList.add("hidden");
+            }
+        });
+
+        if(this.dataset.target){
+            document.getElementById(this.dataset.target).classList.remove("hidden");
+        }
+
+    });
+
+});
+
+</script> 
+    
+</body>
+</html>
