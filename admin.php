@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 // načtení uživatelů
-$result = $conn->query("SELECT id, email, role FROM users");
+$result = $conn->query("SELECT id, email, role FROM users WHERE role != 'admin'");
 ?>
 
 <!DOCTYPE html>
