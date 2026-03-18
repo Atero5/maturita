@@ -9,18 +9,18 @@ if ($conn->connect_error) {
     die("Chyba připojení: " . $conn->connect_error);
 }
 
-// Kontrola, jestli přišla data z formuláře
+// Kontrola, že přišla data z formuláře
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Připravený dotaz
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE email = ?");
+    // SQL dotaz – načteme i roli
+    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($id, $hashed_password);
+    $stmt->bind_result($id, $hashed_password, $role);
     $stmt->fetch();
 
     // Ověření uživatele
@@ -29,13 +29,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Uložení do session
         $_SESSION['user_id'] = $id;
         $_SESSION['email'] = $email;
+        $_SESSION['role'] = $role;
 
-        // Přesměrování na chráněnou stránku
-        header("Location: User.php");
+        // 🔥 Přesměrování podle role
+        if ($role === "teacher") {
+            header("Location: Teacher.php");
+        } elseif ($role === "admin") {
+            header("Location: Admin.php");
+        } else {
+            header("Location: User.php");
+        }
+
         exit();
 
     } else {
-
         // Špatné přihlašovací údaje
         header("Location: login.html?error=1");
         exit();
