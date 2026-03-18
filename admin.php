@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// připojení k DB
+// připojení k databázi
 $conn = new mysqli("localhost", "root", "", "vyletos");
 
 if ($conn->connect_error) {
@@ -45,7 +45,12 @@ $result = $conn->query("SELECT id, email, role FROM users");
         <td>
             <a href="change_role.php?id=<?php echo $user['id']; ?>&role=student">Student</a> |
             <a href="change_role.php?id=<?php echo $user['id']; ?>&role=teacher">Teacher</a> |
-            <a href="change_role.php?id=<?php echo $user['id']; ?>&role=admin">Admin</a>
+            <a href="change_role.php?id=<?php echo $user['id']; ?>&role=admin">Admin</a> |
+            
+            <a href="delete_user.php?id=<?php echo $user['id']; ?>" 
+               onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">
+               Smazat
+            </a>
         </td>
     </tr>
     <?php endwhile; ?>
