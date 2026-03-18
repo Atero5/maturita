@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,8 +26,13 @@
     <ul class="menu">
         <li><button>Moje výlety</button></li>
         <li><button>Oblíbené výlety</button></li>
-        <li><button>přihlášen jako</button></li>
+        <li>
+            <button>
+                Přihlášen jako: <?php echo $_SESSION['email']; ?>
+            </button>
+        </li>
     </ul>
 </nav>
+
 </body>
 </html>

@@ -13,19 +13,22 @@
     <div class="registration">
     <h1>Registrace</h1>
     <hr>
+
+    <form action="register.php" method="POST">
     <div class="field">
         <h3>E-mail:</h3>
-        <input class="input" type="email" placeholder="zadejte E-mail...">
+        <input class="input" type="email" name = "email" placeholder="Zadejte E-mail..." required>
     </div>
     <div class="field">
         <h3>Heslo:</h3>
-        <input class="input" type="password" name="password" placeholder="zadejte heslo...">
+        <input class="input" type="password" name="password" placeholder="Zadejte heslo..." required>
     </div>
     <div class="field">
         <h3>Potvrďte heslo:</h3>
-        <input class="input" type="password" name="password" placeholder="zadejte heslo znovu...">
+        <input class="input" type="password" name="confirm_password" placeholder="Zadejte heslo znovu..." required>
     </div>
-    <button class="btn_green">zaregistrovat se</button>
+    <button class="btn_green" type="submit">zaregistrovat se</button>
+    </form>
     <button class="btn_back" onclick="window.location.href='login.html'">zpět</button>
     </div>
 </body>
