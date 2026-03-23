@@ -28,7 +28,18 @@
     <h3>Název výletu</h3>
     <input type="text" placeholder="Zadejte název...">
     <h3>Adresa ubytování</h3>
-    <input type="text" placeholder="Zadejte adresu...">
+    <input id="address" type="text" placeholder="Zadejte adresu...">
+    <button onclick="zobrazMapu()">📍 Zobrazit na mapě</button>
+
+    <br><br>
+
+    <iframe
+        id="mapa"
+        width="100%"
+        height="500"
+        style="border:1px solid black;">
+    </iframe>
+
     <h3>Délka pobitu</h3>
     <input type="text" placeholder="Zadejte délku...">
 
@@ -110,33 +121,50 @@
     <h3>Číslo účtu</h3>
     <input type="text" placeholder="Zadejte číslo účtu...">
 
+    <button>Potvrdit a odeslat</button>
 
 
-<script>
+    <script>
+        function zobrazMapu() {
+        let adresa = document.getElementById("address").value;
 
-const radios = document.querySelectorAll("input[type=radio]");
-
-radios.forEach(radio => {
-
-    radio.addEventListener("change", function(){
-
-        const group = document.querySelectorAll(`input[name="${this.name}"]`);
-
-        group.forEach(r => {
-            if(r.dataset.target){
-                document.getElementById(r.dataset.target).classList.add("hidden");
-            }
-        });
-
-        if(this.dataset.target){
-            document.getElementById(this.dataset.target).classList.remove("hidden");
+        if (adresa === "") {
+            alert("Zadej adresu!");
+            return;
         }
+
+        // Tohle zobrazí mapu + marker (špendlík)
+        let url = "https://www.google.com/maps?q=" + encodeURIComponent(adresa) + "&output=embed";
+
+        document.getElementById("mapa").src = url;
+        }
+    </script>
+
+    <script>
+
+    const radios = document.querySelectorAll("input[type=radio]");
+
+    radios.forEach(radio => {
+
+        radio.addEventListener("change", function(){
+
+            const group = document.querySelectorAll(`input[name="${this.name}"]`);
+
+            group.forEach(r => {
+                if(r.dataset.target){
+                    document.getElementById(r.dataset.target).classList.add("hidden");
+                }
+            });
+
+            if(this.dataset.target){
+                document.getElementById(this.dataset.target).classList.remove("hidden");
+            }
+
+        });
 
     });
 
-});
-
-</script> 
+    </script> 
     
 </body>
 </html>
