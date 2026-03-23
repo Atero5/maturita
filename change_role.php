@@ -25,6 +25,6 @@ $stmt->close();
 $conn->close();
 
 // zpět do admin panelu
-header("Location: Admin.php");
+header("Location: Admin.html");
 exit();
 ?>

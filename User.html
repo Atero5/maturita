@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÝLETOS - Uživatelský profil</title>
+    <link rel="stylesheet" href="Navbar.css">
+    <style>
+        /* Skryjeme tělo stránky, dokud nevíme, zda je uživatel přihlášen */
+        body { visibility: hidden; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">VÝLETOS</div>
+        <div class="search-box">
+            <input type="text" placeholder="Vyhledejte výlet...">
+            <button>hledat</button>
+        </div>
+
+        <ul class="menu">
+            <li><button>Moje výlety</button></li>
+            <li><button>Oblíbené výlety</button></li>
+            <li>
+                <button>
+                    Přihlášen jako: <span id="user-email">... načítání</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        // Funkce, která se spustí hned při načtení
+        async function checkAuth() {
+            try {
+                // Zavoláme naše PHP API
+                const response = await fetch('api_auth.php');
+                const data = await response.json();
+
+                if (!data.authenticated) {
+                    // Pokud není přihlášen, přesměrujeme na login
+                    window.location.href = "login.html";
+                } else {
+                    // Pokud je přihlášen, doplníme e-mail do tlačítka
+                    document.getElementById('user-email').textContent = data.email;
+                    // Zobrazíme stránku
+                    document.body.style.visibility = 'visible';
+                }
+            } catch (error) {
+                console.error("Chyba při komunikaci s API:", error);
+                // V případě chyby raději přesměrujeme na login
+                window.location.href = "login.html";
+            }
+        }
+
+        // Spustíme kontrolu
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -33,11 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 🔥 Přesměrování podle role
         if ($role === "teacher") {
-            header("Location: Teacher.php");
+            header("Location: Teacher.html");
         } elseif ($role === "admin") {
-            header("Location: Admin.php");
+            header("Location: Admin.html");
         } else {
-            header("Location: User.php");
+            header("Location: User.html");
         }
 
         exit();
