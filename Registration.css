@@ -25,13 +25,21 @@
 
 .btn_green{
     width: 150px;
-    background-color: green;
+    background-color: #4CAF50;
     display: block;
     margin: 0 auto;
 }
 
+.btn_green:hover{
+    background-color: #45a049;
+}
+
 .btn_back{
     width: 75px;
-    background-color: blue;
+    background-color: #3498db;
     
+}
+
+.btn_back:hover{
+    background-color: #2980b9;
 }
