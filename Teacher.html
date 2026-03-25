@@ -8,7 +8,7 @@
 </head>
 <body>
     <nav class="navbar">
-    <div class="logo">VÝLETOS</div>
+    <div class="logo"><a href="Teacher.html" class="no-style-link">VÝLETOS</a></div>
     <div class="search-box">
         <input type="text" placeholder="Vyhledejte výlet...">
         <button>hledat</button>
@@ -18,8 +18,32 @@
         <li><button onclick="window.location.href='pridani_vyletu.html'">Přidat výlet</button></li>
         <li><button>Moje výlety</button></li>
         <li><button>Oblíbené výlety</button></li>
-        <li><button>Přihlášen jako</button></li>
+        <li>
+            <button>
+                Přihlášen jako: <span id="user-email">... načítání</span>
+            </button>
+        </li>
     </ul>
 </nav>
+<script>
+async function checkTeacherAuth() {
+    try {
+        const response = await fetch('api_auth.php');
+        const data = await response.json();
+
+        // Kontrola: 1. Musí být přihlášen, 2. Musí mít roli teacher (nebo admin)
+        if (!data.authenticated || (data.role !== 'teacher' && data.role !== 'admin')) {
+            window.location.href = "login.html";
+        } else {
+            // Pokud je to učitel, vypíšeme e-mail
+            document.getElementById('user-email').textContent = data.email;
+            document.body.style.visibility = 'visible';
+        }
+    } catch (error) {
+        window.location.href = "login.html";
+    }
+}
+checkTeacherAuth();
+</script>
 </body>
 </html>
