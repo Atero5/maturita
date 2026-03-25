@@ -20,6 +20,20 @@ body {
     font-size: 20px;
     display: flex;
     align-items: center;
+    height: 100%;
+}
+
+.no-style-link {
+  color: inherit;        /* zachová barvu textu */
+  text-decoration: none; /* odstraní podtržení */
+  cursor: pointer;       /* kurzor ruky při najetí */
+  
+}
+
+.logo a {
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 /* MENU */
@@ -73,4 +87,8 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 0 4px 4px 0;
+}
+
+.search-box button:hover {
+    background-color: #45a049;
 }

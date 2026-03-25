@@ -26,6 +26,8 @@
 .btn_green{
     width: 150px;
     background-color: green;
+    display: block;
+    margin: 0 auto;
 }
 
 .btn_back{
