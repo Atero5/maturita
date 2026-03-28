@@ -1,6 +1,9 @@
 <?php
+// Load environment variables
+$env = parse_ini_file(__DIR__ . '/.env');
+
 // Připojení k databázi
-$conn = new mysqli("localhost", "root", "", "vyletos");
+$conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 
 // Kontrola připojení
 if ($conn->connect_error) {
@@ -26,7 +29,7 @@ if ($password !== $confirm_password) {
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // 4️⃣ Připravený dotaz (ochrana proti SQL injection)
-$stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+$stmt = $conn->prepare("INSERT INTO " . $env['USER_TABLE'] . " (email, password) VALUES (?, ?)");
 $stmt->bind_param("ss", $email, $hashed_password);
 
 // 5️⃣ Pokus o uložení

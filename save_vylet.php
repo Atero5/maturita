@@ -2,6 +2,9 @@
 session_start();
 header('Content-Type: application/json');
 
+// Load environment variables
+$env = parse_ini_file(__DIR__ . '/.env');
+
 // 1. Ochrana – jen přihlášený uživatel může ukládat
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Chyba: Nejste přihlášen.']);
@@ -9,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // 2. Připojení k databázi
-$conn = new mysqli("localhost", "root", "", "vyletos");
+$conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 $conn->set_charset("utf8mb4");
 
 if ($conn->connect_error) {
@@ -43,6 +46,9 @@ $adr_rest_obed = $_POST['adresa_restaurace_obed'] ?? null;
 $cas_obeda = $_POST['cas_obeda'] ?? null;
 
 // Večeře
+// $var ?? "fallback_value" znamená: pokud $var existuje a není null,
+// použijeme jeho hodnotu, jinak použijeme "fallback_value"
+// if ($var is set and not null) { use $var } else { use "fallback_value" }
 $typ_vecere = $_POST['typ_vecere'] ?? 'vlastni';
 $nazev_rest_vece = $_POST['nazev_restaurace_vecere'] ?? null;
 $adr_rest_vece = $_POST['adresa_restaurace_vecere'] ?? null;
@@ -53,7 +59,7 @@ $cena = !empty($_POST['celkova_cena']) ? $_POST['celkova_cena'] : 0;
 $cislo_uctu = $_POST['cislo_uctu'] ?? null;
 
 // 4. Příprava SQL dotazu (Prepared Statement)
-$sql = "INSERT INTO vylety (
+$sql = "INSERT INTO " . $env['TRIPS_TABLE'] . " (
     nazev_vyletu, adresa_ubytovani, delka_pobytu, 
     misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, 
     misto_odjezdu_zpet, cas_odjezdu_zpet, dopravni_prostredek_zpet, 

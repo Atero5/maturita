@@ -1,8 +1,11 @@
 <?php
 session_start();
 
+// Load environment variables
+$env = parse_ini_file(__DIR__ . '/.env');
+
 // Připojení k databázi
-$conn = new mysqli("localhost", "root", "", "vyletos");
+$conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 
 // Kontrola připojení
 if ($conn->connect_error) {
@@ -21,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <<<<<<< HEAD
     // SQL dotaz – načteme i roli
-    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, password, role FROM " . $env['USER_TABLE'] . " WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
@@ -46,16 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['role'] = $role;
 
         // 🔥 Přesměrování podle role
-        if ($role === "teacher") {
-            header("Location: Teacher.html");
-        } elseif ($role === "admin") {
-            header("Location: Admin.html");
-        } else {
-            header("Location: User.html");
-        }
-
+        header("Location: index.php");
         exit();
-
     } else {
 =======
 
@@ -71,8 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $stmt->close();
+
 }
 
+$stmt->close();
 $conn->close();
 ?>
