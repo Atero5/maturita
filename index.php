@@ -1,9 +1,6 @@
 <?php
 session_start();
 
-// Load environment variables (if needed for future DB checks)
-$env = parse_ini_file(__DIR__ . '/.env');
-
 // Check if user is logged in
 if (isset($_SESSION['user_id'])) {
     // Redirect based on role

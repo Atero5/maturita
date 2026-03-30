@@ -22,7 +22,18 @@ if ($conn->connect_error) {
 $admin_email = $_SESSION['email'];
 $users = [];
 
-$result = $conn->query("SELECT id, email, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin'");
+// Pagination parameters
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 15;
+$offset = ($page - 1) * $limit;
+
+// Get total count
+$total_result = $conn->query("SELECT COUNT(*) as total FROM " . $env['USER_TABLE'] . " WHERE role != 'admin'");
+$total_row = $total_result->fetch_assoc();
+$total_users = $total_row['total'];
+
+// Get paginated users
+$result = $conn->query("SELECT id, email, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' LIMIT $limit OFFSET $offset");
 while($row = $result->fetch_assoc()) {
     $users[] = $row;
 }
@@ -30,7 +41,10 @@ while($row = $result->fetch_assoc()) {
 // 3. Odeslání dat do HTML
 echo json_encode([
     'admin_email' => $admin_email,
-    'users' => $users
+    'users' => $users,
+    'total' => $total_users,
+    'page' => $page,
+    'limit' => $limit
 ]);
 
 $conn->close();
