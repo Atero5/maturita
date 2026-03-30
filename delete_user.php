@@ -24,7 +24,7 @@ if ($id == $_SESSION['user_id']) {
 }
 
 // smazání uživatele
-$stmt = $conn->prepare("DELETE FROM " . $env['USER_TABLE'] . " WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM " . $env['USER_TABLE'] . " WHERE userId = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 

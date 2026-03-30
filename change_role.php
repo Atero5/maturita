@@ -20,7 +20,7 @@ $id = $_GET['id'];
 $role = $_GET['role'];
 
 // update role
-$stmt = $conn->prepare("UPDATE " . $env['USER_TABLE'] . " SET role = ? WHERE id = ?");
+$stmt = $conn->prepare("UPDATE " . $env['USER_TABLE'] . " SET role = ? WHERE userId = ?");
 $stmt->bind_param("si", $role, $id);
 $stmt->execute();
 

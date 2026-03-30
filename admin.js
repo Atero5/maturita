@@ -22,14 +22,14 @@
             data.users.forEach(user => {
                 const row = `
                     <tr>
-                        <td>${user.id}</td>
+                        <td>${user.userId}</td>
                         <td>${user.email}</td>
                         <td>${user.role}</td>
                         <td>
-                            <a href="change_role.php?id=${user.id}&role=student">Student</a> |
-                            <a href="change_role.php?id=${user.id}&role=teacher">Teacher</a> |
-                            <a href="change_role.php?id=${user.id}&role=admin">Admin</a> |
-                            <a href="delete_user.php?id=${user.id}" 
+                            <a href="change_role.php?id=${user.userId}&role=student">Student</a> |
+                            <a href="change_role.php?id=${user.userId}&role=teacher">Teacher</a> |
+                            <a href="change_role.php?id=${user.userId}&role=admin">Admin</a> |
+                            <a href="delete_user.php?id=${user.userId}" 
                                class="btn-delete"
                                onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">
                                Smazat
