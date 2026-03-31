@@ -60,21 +60,22 @@ $cislo_uctu = $_POST['cislo_uctu'] ?? null;
 
 // 4. Příprava SQL dotazu (Prepared Statement)
 $sql = "INSERT INTO " . $env['TRIPS_TABLE'] . " (
-    nazev_vyletu, adresa_ubytovani, delka_pobytu, 
+    userId, nazev_vyletu, adresa_ubytovani, delka_pobytu, 
     misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, 
     misto_odjezdu_zpet, cas_odjezdu_zpet, dopravni_prostredek_zpet, 
     typ_snidane, nazev_restaurace_snidane, adresa_restaurace_snidane, cas_snidane, 
     typ_obeda, nazev_restaurace_obed, adresa_restaurace_obed, cas_obeda, 
     typ_vecere, nazev_restaurace_vecere, adresa_restaurace_vecere, cas_vecere, 
     celkova_cena, cislo_uctu
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
 
-// "sssssssssssssssssssssds" znamená: 21x string (s), 1x double/decimal (d), 1x string (s)
+// "isssssssssssssssssssssds" znamená: 1x int (i), 21x string (s), 1x double/decimal (d), 1x string (s)
+$user_id = $_SESSION['user_id'];
 $stmt->bind_param(
-    "sssssssssssssssssssssds",
-    $nazev_vyletu, $adresa_ubytovani, $delka_pobytu,
+    "isssssssssssssssssssssds",
+    $user_id, $nazev_vyletu, $adresa_ubytovani, $delka_pobytu,
     $misto_tam, $cas_tam, $doprava_tam,
     $misto_zpet, $cas_zpet, $doprava_zpet,
     $typ_snidane, $nazev_rest_snid, $adr_rest_snid, $cas_snidane,

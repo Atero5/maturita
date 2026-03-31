@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     // SQL dotaz – načteme i roli
-    $stmt = $conn->prepare("SELECT id, password, role FROM " . $env['USER_TABLE'] . " WHERE email = ?");
+    $stmt = $conn->prepare("SELECT userId, password, role FROM " . $env['USER_TABLE'] . " WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
