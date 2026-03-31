@@ -6,6 +6,9 @@
     <title>VÝLETOS - Přidání výletu</title>
     <link rel="stylesheet" href="Navbar.css">
     <link rel="stylesheet" href="Hidden.css">
+    <link rel="stylesheet" href="Add_trip.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
 </head>
 <body>
     <nav class="navbar">
@@ -28,15 +31,16 @@
         
         <h2>Základní informace</h2>
         <h3>Název výletu</h3>
-        <input type="text" name="nazev_vyletu" placeholder="Zadejte název...">
+        <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
         
         <h3>Adresa ubytování</h3>
-        <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu...">
-        <button type="button" onclick="zobrazMapu()"> Zobrazit na mapě</button>
+            <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu..." required>
+            <button type="button" onclick="zobrazMapu()">Zobrazit na mapě</button>
+        
 
         <br><br>
 
-        <iframe
+        <iframe class="hidden"
             id="mapa"
             width="100%"
             height="500"
@@ -44,23 +48,23 @@
         </iframe>
 
         <h3>Délka pobytu</h3>
-        <input type="text" name="delka_pobytu" placeholder="Zadejte délku...">
+        <input type="text" name="delka_pobytu" placeholder="Zadejte délku..." required>
 
         <h2>Doprava tam</h2>
         <h3>Místo odjezdu</h3>
-        <input type="text" name="misto_odjezdu_tam" placeholder="Zadejte místo...">
+        <input type="text" name="misto_odjezdu_tam" placeholder="Zadejte místo..." required>
         <h3>Čas odjezdu</h3>
-        <input type="text" name="cas_odjezdu_tam" placeholder="Zadejte čas...">
+        <input type="text" name="cas_odjezdu_tam" placeholder="Zadejte čas..." required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_tam" placeholder="Zadejte prostředek...">
+        <input type="text" name="dopravni_prostredek_tam" placeholder="Zadejte prostředek..." required>
 
         <h2>Doprava zpět</h2>
         <h3>Místo odjezdu</h3>
-        <input type="text" name="misto_odjezdu_zpet" placeholder="Zadejte místo...">
+        <input type="text" name="misto_odjezdu_zpet" placeholder="Zadejte místo..." required>
         <h3>Čas odjezdu</h3>
-        <input type="text" name="cas_odjezdu_zpet" placeholder="Zadejte čas...">
+        <input type="text" name="cas_odjezdu_zpet" placeholder="Zadejte čas..." required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_zpet" placeholder="Zadejte prostředek...">
+        <input type="text" name="dopravni_prostredek_zpet" placeholder="Zadejte prostředek..." required>
 
         <h2>Stravování</h2>
 
@@ -74,11 +78,11 @@
 
         <div id="BreakfastBox" class="hidden">
             <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_snidane" placeholder="Zadejte restauraci...">
+            <input type="text" name="nazev_restaurace_snidane" placeholder="Zadejte restauraci..." required>
             <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_snidane" placeholder="Zadejte adresu...">
+            <input type="text" name="adresa_restaurace_snidane" placeholder="Zadejte adresu..." required>
             <h3>Čas snídaně</h3>
-            <input type="text" name="cas_snidane" placeholder="Zadejte čas...">
+            <input type="text" name="cas_snidane" placeholder="Zadejte čas..." required>
         </div>
 
         <h3>Oběd</h3>
@@ -91,11 +95,11 @@
 
         <div id="LunchBox" class="hidden">
             <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_obed" placeholder="Zadejte restauraci...">
+            <input type="text" name="nazev_restaurace_obed" placeholder="Zadejte restauraci..." required>
             <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_obed" placeholder="Zadejte adresu...">
+            <input type="text" name="adresa_restaurace_obed" placeholder="Zadejte adresu..." required>
             <h3>Čas oběda</h3>
-            <input type="text" name="cas_obeda" placeholder="Zadejte čas...">
+            <input type="text" name="cas_obeda" placeholder="Zadejte čas..." required>
         </div>
 
         <h3>Večeře</h3>
@@ -108,23 +112,24 @@
 
         <div id="DinnerBox" class="hidden">
             <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_vecere" placeholder="Zadejte restauraci...">
+            <input type="text" name="nazev_restaurace_vecere" placeholder="Zadejte restauraci..." required>
             <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_vecere" placeholder="Zadejte adresu...">
+            <input type="text" name="adresa_restaurace_vecere" placeholder="Zadejte adresu..." required>
             <h3>Čas večeře</h3>
-            <input type="text" name="cas_vecere" placeholder="Zadejte čas...">
+            <input type="text" name="cas_vecere" placeholder="Zadejte čas..." required>
         </div>
 
         <h2>Cena</h2>
         <h3>Celková cena</h3>
-        <input type="text" name="celkova_cena" placeholder="Zadejte cenu...">
+        <input type="text" name="celkova_cena" placeholder="Zadejte cenu..." required>
         <h3>Číslo účtu</h3>
-        <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu...">
+        <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu..." required>
 
         <br><br>
         <button type="submit" style="padding: 15px 30px; font-weight: bold;">Potvrdit a odeslat výlet</button>
     </form>
+    <script src="Add_trip.js"></script>
 
-    <script src="pridani_vyletu.js"></script> 
+ 
 </body>
 </html>

@@ -1,14 +1,19 @@
 // Původní funkce pro mapu
 function zobrazMapu() {
-    let adresa = document.getElementById("address").value;
-    if (adresa === "") {
-        alert("Zadej adresu!");
-        return;
-    }
-    // Opravené URL pro Google Maps embed
-    let url = "https://maps.google.com/maps?q=" + encodeURIComponent(adresa) + "&output=embed";
-    document.getElementById("mapa").src = url;
-}
+            let adresa = document.getElementById("address").value;
+            if (adresa === "") {
+                alert("Zadej adresu!");
+                return;
+            }
+
+            let url = "https://maps.google.com/maps?q=" + encodeURIComponent(adresa) + "&output=embed";
+
+            let mapa = document.getElementById("mapa");
+            mapa.src = url;
+
+            // 👇 zobrazí mapu
+            mapa.classList.remove("hidden");
+        }
 
 // Skript pro přepínání skrytých polí
 const radios = document.querySelectorAll("input[type=radio]");
