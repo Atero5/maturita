@@ -22,7 +22,14 @@
             <li><button type="button" onclick="window.location.href='Add_trip.html'">Přidat výlet</button></li>
             <li><button type="button">Moje výlety</button></li>
             <li><button type="button">Oblíbené výlety</button></li>
-            <li><button type="button">přihlášen jako</button></li>
+            <li class="user-menu">
+                <button type="button" onclick="toggleMenu()">přihlášen jako</button>
+
+                <div id="userDropdown" class="dropdown hidden">
+                    <p>Jan Novák</p>
+                    <button onclick="logout()">Odhlásit</button>
+                </div>
+            </li>
         </ul>
     </nav>
 
@@ -129,6 +136,7 @@
         <button type="submit" style="padding: 15px 30px; font-weight: bold;">Potvrdit a odeslat výlet</button>
     </form>
     <script src="Add_trip.js"></script>
+    <script src="navbar.js"></script>
 
  
 </body>
