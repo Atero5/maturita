@@ -14,6 +14,10 @@
         <div class="login">
             <h1>Přihlášení</h1>
             <hr>
+            
+            <div id="successMessage" class="success-message" style="display:none;">
+                <p>✓ Registrace byla úspěšná! Nyní se můžete přihlásit.</p>
+            </div>
 
             <form action="login.php" method="POST">
 
@@ -31,6 +35,19 @@
             <h6 class="link">Nemáte ještě svůj účet <a href="registration.html">zaregistrujte se</a>.</h6>
             
         </div>
+        
+        <script>
+            // Zkontroluj, zda má URL parametr ?registered=true
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('registered') === 'true') {
+                const successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.style.display = 'block';
+                }
+                // Odstraň parametr z URL aby se nezobrazoval pokaždé
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        </script>
     </body>
 
 </html>
