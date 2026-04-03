@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VÝLETOS - Uživatelský profil</title>
     <link rel="stylesheet" href="Navbar.css">
+    <link rel="stylesheet" href="User.css">
 
     <style>
         /* Skryjeme tělo stránky, dokud nevíme, zda je uživatel přihlášen */
@@ -24,13 +25,23 @@
             <li><button>Oblíbené výlety</button></li>
             <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
+
                 <div id="userDropdown" class="dropdown hidden">
                     <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
-                    <a href="logout.php" class="logout-link">Odhlásit</a>
+                    <button class="logout-link" onclick="window.location.href='logout.php'">Odhlásit</button>      
                 </div>
             </li>
         </ul>
     </nav>
+
+    <main class="page-content">
+        <section class="white-box">
+            <h1>Výlety</h1>
+            <hr>
+            <!-- TODO: obsah uživatelského profilu -->
+        </section>
+    </main>
+
     <script src="navbar.js"></script>
     <script src="user.js"></script>
 

@@ -27,7 +27,7 @@
 
                 <div id="userDropdown" class="dropdown hidden">
                     <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
-                    <a href="logout.php" class="logout-link">Odhlásit</a>      
+                    <button class="logout-link" onclick="window.location.href='logout.php'">Odhlásit</button>      
                 </div>
             </li>
         </ul>
@@ -41,8 +41,10 @@
         <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
         
         <h3>Adresa ubytování</h3>
+        <div class="address-container">
             <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu..." required>
             <button type="button" onclick="zobrazMapu()">Zobrazit na mapě</button>
+        </div>
         
 
         <br><br>
@@ -132,8 +134,18 @@
         <h3>Číslo účtu</h3>
         <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu..." required>
 
+        <h3>Třídy na výlet</h3>
+        <div class="classes-grid">
+            <label><input type="checkbox" name="tridy[]" value="V4A"> V4A</label>
+            <label><input type="checkbox" name="tridy[]" value="V4B"> V4B</label>
+            <label><input type="checkbox" name="tridy[]" value="V4C"> V4C</label>
+            <label><input type="checkbox" name="tridy[]" value="S4A"> S4A</label>
+            <label><input type="checkbox" name="tridy[]" value="S4B"> S4B</label>
+            <label><input type="checkbox" name="tridy[]" value="S4C"> S4C</label>
+        </div>
+
         <br><br>
-        <button type="submit" style="padding: 15px 30px; font-weight: bold;">Potvrdit a odeslat výlet</button>
+        <button type="submit" >Potvrdit a odeslat výlet</button>
     </form>
     <script src="Add_trip.js"></script>
     <script src="navbar.js"></script>

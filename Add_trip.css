@@ -89,3 +89,37 @@ form iframe {
     border-radius: 10px;
     margin-top: 10px;
 }
+
+/* address container */
+.address-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.address-container input {
+    width: auto;
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* třídy ve třech sloupcích */
+.classes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.classes-grid label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+}
+
+.classes-grid input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
