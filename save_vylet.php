@@ -86,6 +86,17 @@ $stmt->bind_param(
 
 // 5. Provedení a odeslání výsledku zpět do HTML
 if ($stmt->execute()) {
+    // Uložení tříd do tabulky vylety_tridy
+    $vylet_id = $conn->insert_id;
+    $tridy = $_POST['tridy'] ?? [];
+
+    foreach ($tridy as $trida) {
+        $stmt2 = $conn->prepare("INSERT INTO vylety_tridy (vyletId, tridy) VALUES (?, ?)");
+        $stmt2->bind_param("is", $vylet_id, $trida);
+        $stmt2->execute();
+        $stmt2->close();
+    }
+
     echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně naplánován a uložen!']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Chyba při ukládání: ' . $stmt->error]);
