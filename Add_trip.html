@@ -23,11 +23,11 @@
             <li><button type="button">Moje výlety</button></li>
             <li><button type="button">Oblíbené výlety</button></li>
             <li class="user-menu">
-                <button type="button" onclick="toggleMenu()">přihlášen jako</button>
+                <button type="button" onclick="toggleMenu()">Profil</button>
 
                 <div id="userDropdown" class="dropdown hidden">
-                    <p>Jan Novák</p>
-                    <button onclick="logout()">Odhlásit</button>
+                    <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
+                    <a href="logout.php" class="logout-link">Odhlásit</a>      
                 </div>
             </li>
         </ul>

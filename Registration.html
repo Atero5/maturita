@@ -46,19 +46,6 @@
     <button class="btn_back" onclick="window.location.href='login.html'">zpět</button>
     </div>
 
-    <script>
-        function updateRole() {
-            const classSelect = document.getElementById('classSelect');
-            const roleInput = document.getElementById('roleInput');
-
-            if (classSelect.value === 'teacher') {
-                roleInput.value = 'teacher';
-            } else if (classSelect.value !== '') {
-                roleInput.value = 'student';
-            } else {
-                roleInput.value = '';
-            }
-        }
-    </script>
+    <script src="registration.js"></script>
 </body>
 </html>

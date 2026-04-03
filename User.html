@@ -22,13 +22,16 @@
         <ul class="menu">
             <li><button>Moje výlety</button></li>
             <li><button>Oblíbené výlety</button></li>
-            <li>
-                <button>
-                    Přihlášen jako: <span id="user-email">... načítání</span>
-                </button>
+            <li class="user-menu">
+                <button type="button" onclick="toggleMenu()">Profil</button>
+                <div id="userDropdown" class="dropdown hidden">
+                    <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
+                    <a href="logout.php" class="logout-link">Odhlásit</a>
+                </div>
             </li>
         </ul>
     </nav>
+    <script src="navbar.js"></script>
     <script src="user.js"></script>
 
 </body>

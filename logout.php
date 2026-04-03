@@ -2,6 +2,6 @@
 session_start();      // otevře existující session
 session_destroy();    // zničí session (odhlásí uživatele)
 
-header("Location: login.html");  // přesměruje zpět na login
+header("Location: login.html?logout=true");  // přesměruje zpět na login s parametrem
 exit();
 ?>
