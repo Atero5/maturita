@@ -5,11 +5,25 @@
     <title>Admin panel</title>
     <style>
         /* Skryjeme obsah, dokud neověříme práva */
-        body { display: none; font-family: sans-serif; }
+        body { display: none; font-family: sans-serif; padding: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
         th { background-color: #f4f4f4; }
-        .btn-delete { color: red; }
+        .btn-delete { color: red; cursor: pointer; }
+        .btn-edit { color: blue; cursor: pointer; }
+        .section-title { margin-top: 40px; }
+        
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; padding: 30px; border-radius: 8px; width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { margin-top: 0; }
+        .modal label { display: block; margin-top: 10px; font-weight: bold; }
+        .modal input, .modal select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+        .modal-buttons { margin-top: 20px; display: flex; gap: 10px; }
+        .modal-buttons button { padding: 8px 16px; cursor: pointer; }
+        .btn-save { background: #4CAF50; color: white; border: none; border-radius: 4px; }
+        .btn-cancel { background: #ccc; border: none; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -17,11 +31,13 @@
 <h1>Admin panel</h1>
 <p>Přihlášen jako: <strong id="admin-email">...</strong></p>
 
+<h2>Uživatelé</h2>
 <table>
     <thead>
         <tr>
             <th>ID</th>
             <th>Email</th>
+            <th>Třída</th>
             <th>Role</th>
             <th>Akce</th>
         </tr>
@@ -31,6 +47,59 @@
 </table>
 
 <div id="pagination-controls"></div>
+
+<h2 class="section-title">Výlety</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Název</th>
+            <th>Délka pobytu</th>
+            <th>Místo odjezdu</th>
+            <th>Cena</th>
+            <th>Třídy</th>
+            <th>Akce</th>
+        </tr>
+    </thead>
+    <tbody id="trips-table-body">
+    </tbody>
+</table>
+
+<div id="trips-pagination-controls"></div>
+
+<!-- Modal pro úpravu výletu -->
+<div class="modal-overlay" id="editTripModal">
+    <div class="modal">
+        <h2>Upravit výlet</h2>
+        <input type="hidden" id="edit-trip-id">
+        
+        <label>Název výletu</label>
+        <input type="text" id="edit-nazev">
+        
+        <label>Adresa ubytování</label>
+        <input type="text" id="edit-adresa">
+        
+        <label>Délka pobytu</label>
+        <input type="text" id="edit-delka">
+        
+        <label>Místo odjezdu (tam)</label>
+        <input type="text" id="edit-misto">
+        
+        <label>Čas odjezdu (tam)</label>
+        <input type="text" id="edit-cas">
+        
+        <label>Dopravní prostředek (tam)</label>
+        <input type="text" id="edit-doprava">
+        
+        <label>Celková cena</label>
+        <input type="text" id="edit-cena">
+        
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="saveTrip()">Uložit</button>
+            <button class="btn-cancel" onclick="closeEditModal()">Zrušit</button>
+        </div>
+    </div>
+</div>
 
 <br>
 <a href="logout.php">Odhlásit se</a>

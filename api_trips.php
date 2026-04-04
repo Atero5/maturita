@@ -25,21 +25,64 @@ if ($conn->connect_error) {
 $trips = [];
 
 // 3. Načtení výletů
-// Pro všechny přihlášené uživatele: všechny výlety
-$query = "SELECT 
-    vyletId, 
-    userId, 
-    nazev_vyletu, 
-    adresa_ubytovani, 
-    delka_pobytu, 
-    celkova_cena,
-    misto_odjezdu_tam,
-    cas_odjezdu_tam,
-    dopravni_prostredek_tam
-FROM " . $env['TRIPS_TABLE'] . " 
-ORDER BY vyletId DESC";
+if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
+    // Pro studenty: pouze výlety přiřazené k jejich třídě
+    $query = "SELECT 
+        v.vyletId, 
+        v.userId, 
+        v.nazev_vyletu, 
+        v.adresa_ubytovani, 
+        v.delka_pobytu, 
+        v.celkova_cena,
+        v.misto_odjezdu_tam,
+        v.cas_odjezdu_tam,
+        v.dopravni_prostredek_tam
+    FROM " . $env['TRIPS_TABLE'] . " v
+    INNER JOIN vylety_tridy vt ON v.vyletId = vt.vyletId
+    WHERE vt.tridy = ?
+    ORDER BY v.vyletId DESC";
 
-$result = $conn->query($query);
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $_SESSION['class']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} elseif ($_SESSION['role'] === 'teacher') {
+    // Pro učitele: pouze výlety, které sám vytvořil
+    $query = "SELECT 
+        vyletId, 
+        userId, 
+        nazev_vyletu, 
+        adresa_ubytovani, 
+        delka_pobytu, 
+        celkova_cena,
+        misto_odjezdu_tam,
+        cas_odjezdu_tam,
+        dopravni_prostredek_tam
+    FROM " . $env['TRIPS_TABLE'] . " 
+    WHERE userId = ?
+    ORDER BY vyletId DESC";
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    // Pro adminy: všechny výlety
+    $query = "SELECT 
+        vyletId, 
+        userId, 
+        nazev_vyletu, 
+        adresa_ubytovani, 
+        delka_pobytu, 
+        celkova_cena,
+        misto_odjezdu_tam,
+        cas_odjezdu_tam,
+        dopravni_prostredek_tam
+    FROM " . $env['TRIPS_TABLE'] . " 
+    ORDER BY vyletId DESC";
+
+    $result = $conn->query($query);
+}
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {

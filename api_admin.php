@@ -33,7 +33,7 @@ $total_row = $total_result->fetch_assoc();
 $total_users = $total_row['total'];
 
 // Get paginated users
-$result = $conn->query("SELECT userId, email, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' LIMIT $limit OFFSET $offset");
+$result = $conn->query("SELECT userId, email, class, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' LIMIT $limit OFFSET $offset");
 while($row = $result->fetch_assoc()) {
     $users[] = $row;
 }

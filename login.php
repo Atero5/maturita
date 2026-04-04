@@ -18,12 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // SQL dotaz – načteme i roli
-    $stmt = $conn->prepare("SELECT userId, password, role FROM " . $env['USER_TABLE'] . " WHERE email = ?");
+    // SQL dotaz – načteme i roli a třídu
+    $stmt = $conn->prepare("SELECT userId, password, role, class FROM " . $env['USER_TABLE'] . " WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($id, $hashed_password, $role);
+    $stmt->bind_result($id, $hashed_password, $role, $class);
     $stmt->fetch();
 
     // Ověření uživatele
@@ -33,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $id;
         $_SESSION['email'] = $email;
         $_SESSION['role'] = $role;
+        $_SESSION['class'] = $class;
 
         // 🔥 Přesměrování podle role
         header("Location: index.php");
