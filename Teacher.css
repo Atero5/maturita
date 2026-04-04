@@ -22,3 +22,83 @@ body {
 h1 {
     text-align: center;
 }
+
+/* Grid layout pro karty - dvě sloupce */
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Jednotlivá karta */
+.trip-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trip-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    border-color: #007bff;
+}
+
+.trip-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.trip-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 12px 0;
+}
+
+.trip-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.trip-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.trip-card-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.trip-card-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.trip-card-price {
+    font-size: 16px;
+    color: #007bff;
+    font-weight: 700;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .trips-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
