@@ -186,6 +186,9 @@ fetch('api_auth.php')
     .then(data => {
         if (data.authenticated) {
             document.getElementById('user-email').textContent = data.email;
+            document.body.style.visibility = 'visible';
+        } else {
+            window.location.href = 'login.html';
         }
     });
 
