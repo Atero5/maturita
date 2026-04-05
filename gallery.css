@@ -1,0 +1,145 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.page-content {
+    max-width: 900px;
+    width: 90%;
+    margin: 50px auto;
+}
+
+.white-box {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    min-height: 200px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.search-container {
+    max-width: 400px;
+    margin: 15px auto;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.gallery-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.gallery-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.gallery-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gallery-item-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+}
+
+.gallery-item-date {
+    font-size: 13px;
+    color: #888;
+}
+
+.gallery-item-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-gallery {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-add-photo {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-add-photo:hover {
+    background-color: #218838;
+}
+
+.btn-add-photo:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-view-photos {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-view-photos:hover {
+    background-color: #0056b3;
+}
+
+.no-trips {
+    text-align: center;
+    color: #999;
+    padding: 40px 0;
+    font-size: 15px;
+}
+
+.badge-upcoming {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    background-color: #fff3cd;
+    color: #856404;
+    margin-left: 8px;
+}
+
+.active-nav {
+    background-color: rgba(255,255,255,0.2) !important;
+}

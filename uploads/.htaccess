@@ -1,0 +1,11 @@
+# Prevent PHP execution in uploads directory
+php_flag engine off
+
+# Only allow image files
+<FilesMatch "\.(?i:jpe?g|png|gif|webp)$">
+    Require all granted
+</FilesMatch>
+
+<FilesMatch "\.(?i:php|phtml|php[0-9])$">
+    Require all denied
+</FilesMatch>

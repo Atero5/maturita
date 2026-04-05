@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÝLETOS - Fotogalerie</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="gallery.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { visibility: hidden; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="#" id="logo-link" class="no-style-link">VÝLETOS</a></div>
+        <div class="search-box">
+            <input type="text" placeholder="Vyhledejte výlet...">
+            <button type="button">hledat</button>
+        </div>
+        <ul class="menu" id="navMenu">
+            <li id="navAddTrip" style="display:none"><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
+            <li><button type="button">Moje výlety</button></li>
+            <li><button type="button">Oblíbené výlety</button></li>
+            <li><button type="button" onclick="window.location.href='gallery.html'" class="active-nav">Fotogalerie</button></li>
+            <li class="user-menu">
+                <button type="button" onclick="toggleMenu()">Profil</button>
+                <div id="userDropdown" class="dropdown hidden">
+                    <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
+                    <button class="logout-link" onclick="window.location.href='logout.php'">Odhlásit</button>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="page-content">
+        <section class="white-box">
+            <h1>Fotogalerie</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Hledat výlet podle názvu..." autocomplete="off">
+            </div>
+            <hr>
+            <div id="tripsContainer">
+                <p style="text-align:center; color:#999;">Načítání...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="navbar.js"></script>
+    <script src="gallery.js"></script>
+</body>
+</html>
