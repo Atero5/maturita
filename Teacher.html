@@ -11,11 +11,6 @@
 <body>
     <nav class="navbar">
     <div class="logo"><a href="Teacher.html" class="no-style-link">VÝLETOS</a></div>
-    <div class="search-box">
-        <input type="text" placeholder="Vyhledejte výlet...">
-        <button>hledat</button>
-    </div>
-
     <ul class="menu">
         <li><button onclick="window.location.href='Add_trip.html'">Přidat výlet</button></li>
         <li><button>Moje výlety</button></li>
@@ -33,6 +28,9 @@
     <main class="page-content">
         <section class="white-box">
             <h1>Výlety</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Hledat výlet podle názvu, místa..." autocomplete="off">
+            </div>
             <hr>
             
             <div class="trips-grid" id="tripsContainer">

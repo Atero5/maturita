@@ -24,19 +24,50 @@
             }
         }
 
+        let allTrips = [];
+
         async function loadTrips() {
             try {
                 const response = await fetch('api_trips.php');
                 const data = await response.json();
                 
                 if (data.success && data.trips.length > 0) {
-                    renderTripsCards(data.trips);
+                    allTrips = data.trips;
+                    filterAndRenderTrips();
                 } else {
+                    allTrips = [];
                     renderNoTripsMessage();
                 }
             } catch (error) {
                 console.error('Chyba při načítání výletů:', error);
+                allTrips = [];
                 renderNoTripsMessage();
+            }
+        }
+
+        function filterAndRenderTrips() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            if (query === '') {
+                renderTripsCards(allTrips);
+                return;
+            }
+
+            const filtered = allTrips.filter(trip => {
+                const nazev = (trip.nazev || '').toLowerCase();
+                return nazev.includes(query);
+            });
+
+            if (filtered.length > 0) {
+                renderTripsCards(filtered);
+            } else {
+                const container = document.getElementById('tripsContainer');
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                        <p style="font-size: 16px;">Žádné výlety neodpovídají vyhledávání</p>
+                    </div>
+                `;
             }
         }
 
@@ -104,3 +135,6 @@
 
         // Spustíme kontrolu
         checkAuth();
+
+        // Vyhledávání výletů v reálném čase
+        document.getElementById('searchInput')?.addEventListener('input', filterAndRenderTrips);

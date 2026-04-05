@@ -37,13 +37,34 @@ radios.forEach(radio => {
     });
 });
 
-// Validace - alespoň jedna třída musí být vybraná
+// Validace a odeslání formuláře přes fetch
 document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
     const checked = document.querySelectorAll('input[name="tridy[]"]:checked');
     if (checked.length === 0) {
-        e.preventDefault();
         alert("Vyberte alespoň jednu třídu!");
+        return;
     }
+
+    const formData = new FormData(this);
+
+    fetch('save_vylet.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = 'Teacher.html';
+        } else {
+            alert(data.message || 'Chyba při ukládání výletu');
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při ukládání výletu');
+    });
 });
 
 // Načítání emailu uživatele

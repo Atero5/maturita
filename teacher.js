@@ -19,19 +19,50 @@ async function checkTeacherAuth() {
     }
 }
 
+let allTrips = [];
+
 async function loadTrips() {
     try {
         const response = await fetch('api_trips.php');
         const data = await response.json();
         
         if (data.success && data.trips.length > 0) {
-            renderTripsCards(data.trips);
+            allTrips = data.trips;
+            filterAndRenderTrips();
         } else {
+            allTrips = [];
             renderNoTripsMessage();
         }
     } catch (error) {
         console.error('Chyba při načítání výletů:', error);
+        allTrips = [];
         renderNoTripsMessage();
+    }
+}
+
+function filterAndRenderTrips() {
+    const searchInput = document.getElementById('searchInput');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    if (query === '') {
+        renderTripsCards(allTrips);
+        return;
+    }
+
+    const filtered = allTrips.filter(trip => {
+        const nazev = (trip.nazev || '').toLowerCase();
+        return nazev.includes(query);
+    });
+
+    if (filtered.length > 0) {
+        renderTripsCards(filtered);
+    } else {
+        const container = document.getElementById('tripsContainer');
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                <p style="font-size: 16px;">Žádné výlety neodpovídají vyhledávání</p>
+            </div>
+        `;
     }
 }
 
@@ -68,14 +99,14 @@ function renderTripsCards(trips) {
                             <span class="trip-card-value">${escapeHtml(trip.cas || 'N/A')}</span>
                         </div>
                     </div>
-                    <div class="trip-card-footer">
-                        <div class="trip-card-price">Cena: ${cenaFormatted}</div>
-                        <div class="trip-card-actions">
-                            <button type="button" class="trip-card-button trip-card-button-edit" onclick="editTrip(event, ${trip.id})">Upravit</button>
-                            <button type="button" class="trip-card-button trip-card-button-delete" onclick="deleteTrip(event, ${trip.id})">Smazat</button>
-                        </div>
-                    </div>
                 </a>
+                <div class="trip-card-footer">
+                    <div class="trip-card-price">Cena: ${cenaFormatted}</div>
+                    <div class="trip-card-actions">
+                        <button type="button" class="trip-card-button trip-card-button-edit" onclick="editTrip(event, ${trip.id})">Upravit</button>
+                        <button type="button" class="trip-card-button trip-card-button-delete" onclick="deleteTrip(event, ${trip.id})">Smazat</button>
+                    </div>
+                </div>
             </div>
         `;
         
@@ -111,13 +142,33 @@ function editTrip(event, tripId) {
     window.location.href = `Change_trip.html?id=${tripId}`;
 }
 
-// Funkce pro smazání výletu (zatím jen placeholder)
-function deleteTrip(event, tripId) {
-    event.stopPropagation(); // Zastaví propagaci události na rodičovské prvky
-    if (confirm('Opravdu chcete smazat tento výlet?')) {
-        // Zde bude logika pro smazání výletu
-        console.log('Smazat výlet s ID:', tripId);
+// Funkce pro smazání výletu
+async function deleteTrip(event, tripId) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!confirm('Opravdu chcete smazat tento výlet?')) return;
+
+    try {
+        const response = await fetch('api_trips.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: tripId })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            await loadTrips();
+            alert('Výlet byl úspěšně smazán');
+        } else {
+            alert(data.message || 'Chyba při mazání výletu');
+        }
+    } catch (error) {
+        console.error('Chyba při mazání výletu:', error);
+        alert('Chyba při mazání výletu');
     }
 }
 
 checkTeacherAuth();
+
+// Vyhledávání výletů v reálném čase
+document.getElementById('searchInput')?.addEventListener('input', filterAndRenderTrips);

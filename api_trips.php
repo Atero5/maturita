@@ -22,6 +22,206 @@ if ($conn->connect_error) {
     exit();
 }
 
+$method = $_SERVER['REQUEST_METHOD'];
+
+// ========== GET detail – načtení jednoho výletu pro úpravu ==========
+if ($method === 'GET' && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+
+    $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+    $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        // Načtení tříd
+        $tridyStmt = $conn->prepare("SELECT tridy FROM vylety_tridy WHERE vyletId = ?");
+        $tridyStmt->bind_param("i", $id);
+        $tridyStmt->execute();
+        $tridyResult = $tridyStmt->get_result();
+        $tridy = [];
+        while ($t = $tridyResult->fetch_assoc()) {
+            $tridy[] = $t['tridy'];
+        }
+        $tridyStmt->close();
+
+        echo json_encode([
+            'success' => true,
+            'trip' => [
+                'id' => $row['vyletId'],
+                'nazev_vyletu' => $row['nazev_vyletu'],
+                'adresa_ubytovani' => $row['adresa_ubytovani'],
+                'delka_pobytu' => $row['delka_pobytu'],
+                'misto_odjezdu_tam' => $row['misto_odjezdu_tam'],
+                'cas_odjezdu_tam' => $row['cas_odjezdu_tam'],
+                'dopravni_prostredek_tam' => $row['dopravni_prostredek_tam'],
+                'misto_odjezdu_zpet' => $row['misto_odjezdu_zpet'],
+                'cas_odjezdu_zpet' => $row['cas_odjezdu_zpet'],
+                'dopravni_prostredek_zpet' => $row['dopravni_prostredek_zpet'],
+                'typ_snidane' => $row['typ_snidane'],
+                'nazev_restaurace_snidane' => $row['nazev_restaurace_snidane'],
+                'adresa_restaurace_snidane' => $row['adresa_restaurace_snidane'],
+                'cas_snidane' => $row['cas_snidane'],
+                'typ_obeda' => $row['typ_obeda'],
+                'nazev_restaurace_obed' => $row['nazev_restaurace_obed'],
+                'adresa_restaurace_obed' => $row['adresa_restaurace_obed'],
+                'cas_obeda' => $row['cas_obeda'],
+                'typ_vecere' => $row['typ_vecere'],
+                'nazev_restaurace_vecere' => $row['nazev_restaurace_vecere'],
+                'adresa_restaurace_vecere' => $row['adresa_restaurace_vecere'],
+                'cas_vecere' => $row['cas_vecere'],
+                'celkova_cena' => $row['celkova_cena'],
+                'cislo_uctu' => $row['cislo_uctu'],
+                'tridy' => $tridy
+            ]
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Výlet nenalezen nebo nemáte oprávnění']);
+    }
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+
+// ========== PUT – úprava výletu (učitel může upravit jen své) ==========
+if ($method === 'PUT') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = isset($input['id']) ? (int)$input['id'] : 0;
+
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Neplatné ID']);
+        $conn->close();
+        exit();
+    }
+
+    // Ověření vlastnictví
+    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+    $check->bind_param("ii", $id, $_SESSION['user_id']);
+    $check->execute();
+    if ($check->get_result()->num_rows === 0) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Nemáte oprávnění upravit tento výlet']);
+        $check->close();
+        $conn->close();
+        exit();
+    }
+    $check->close();
+
+    $nazev = $input['nazev_vyletu'] ?? '';
+    $adresa = $input['adresa_ubytovani'] ?? '';
+    $delka = $input['delka_pobytu'] ?? '';
+    $misto_tam = $input['misto_odjezdu_tam'] ?? '';
+    $cas_tam = $input['cas_odjezdu_tam'] ?? '';
+    $doprava_tam = $input['dopravni_prostredek_tam'] ?? '';
+    $misto_zpet = $input['misto_odjezdu_zpet'] ?? '';
+    $cas_zpet = $input['cas_odjezdu_zpet'] ?? '';
+    $doprava_zpet = $input['dopravni_prostredek_zpet'] ?? '';
+    $typ_snidane = $input['typ_snidane'] ?? 'vlastni';
+    $nazev_rest_snid = $input['nazev_restaurace_snidane'] ?? null;
+    $adr_rest_snid = $input['adresa_restaurace_snidane'] ?? null;
+    $cas_snidane = $input['cas_snidane'] ?? null;
+    $typ_obeda = $input['typ_obeda'] ?? 'vlastni';
+    $nazev_rest_obed = $input['nazev_restaurace_obed'] ?? null;
+    $adr_rest_obed = $input['adresa_restaurace_obed'] ?? null;
+    $cas_obeda = $input['cas_obeda'] ?? null;
+    $typ_vecere = $input['typ_vecere'] ?? 'vlastni';
+    $nazev_rest_vece = $input['nazev_restaurace_vecere'] ?? null;
+    $adr_rest_vece = $input['adresa_restaurace_vecere'] ?? null;
+    $cas_vecere = $input['cas_vecere'] ?? null;
+    $cena = !empty($input['celkova_cena']) ? $input['celkova_cena'] : 0;
+    $cislo_uctu = $input['cislo_uctu'] ?? null;
+
+    $stmt = $conn->prepare("UPDATE " . $env['TRIPS_TABLE'] . " SET 
+        nazev_vyletu = ?, adresa_ubytovani = ?, delka_pobytu = ?,
+        misto_odjezdu_tam = ?, cas_odjezdu_tam = ?, dopravni_prostredek_tam = ?,
+        misto_odjezdu_zpet = ?, cas_odjezdu_zpet = ?, dopravni_prostredek_zpet = ?,
+        typ_snidane = ?, nazev_restaurace_snidane = ?, adresa_restaurace_snidane = ?, cas_snidane = ?,
+        typ_obeda = ?, nazev_restaurace_obed = ?, adresa_restaurace_obed = ?, cas_obeda = ?,
+        typ_vecere = ?, nazev_restaurace_vecere = ?, adresa_restaurace_vecere = ?, cas_vecere = ?,
+        celkova_cena = ?, cislo_uctu = ?
+        WHERE vyletId = ? AND userId = ?");
+    $stmt->bind_param(
+        "sssssssssssssssssssssdsii",
+        $nazev, $adresa, $delka,
+        $misto_tam, $cas_tam, $doprava_tam,
+        $misto_zpet, $cas_zpet, $doprava_zpet,
+        $typ_snidane, $nazev_rest_snid, $adr_rest_snid, $cas_snidane,
+        $typ_obeda, $nazev_rest_obed, $adr_rest_obed, $cas_obeda,
+        $typ_vecere, $nazev_rest_vece, $adr_rest_vece, $cas_vecere,
+        $cena, $cislo_uctu,
+        $id, $_SESSION['user_id']
+    );
+
+    if ($stmt->execute()) {
+        // Aktualizace tříd
+        $delTridy = $conn->prepare("DELETE FROM vylety_tridy WHERE vyletId = ?");
+        $delTridy->bind_param("i", $id);
+        $delTridy->execute();
+        $delTridy->close();
+
+        $tridy = $input['tridy'] ?? [];
+        foreach ($tridy as $trida) {
+            $ins = $conn->prepare("INSERT INTO vylety_tridy (vyletId, tridy) VALUES (?, ?)");
+            $ins->bind_param("is", $id, $trida);
+            $ins->execute();
+            $ins->close();
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně upraven']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Chyba při úpravě výletu']);
+    }
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+
+// ========== DELETE – smazání výletu (učitel může smazat jen své) ==========
+if ($method === 'DELETE') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = isset($input['id']) ? (int)$input['id'] : 0;
+
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Neplatné ID']);
+        $conn->close();
+        exit();
+    }
+
+    // Ověření, že výlet patří přihlášenému učiteli
+    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+    $check->bind_param("ii", $id, $_SESSION['user_id']);
+    $check->execute();
+    $checkResult = $check->get_result();
+
+    if ($checkResult->num_rows === 0) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Nemáte oprávnění smazat tento výlet']);
+        $check->close();
+        $conn->close();
+        exit();
+    }
+    $check->close();
+
+    // Smazání přiřazených tříd
+    $stmt = $conn->prepare("DELETE FROM vylety_tridy WHERE vyletId = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Smazání výletu
+    $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+    $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+
+    if ($stmt->execute() && $stmt->affected_rows > 0) {
+        echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně smazán']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Chyba při mazání výletu']);
+    }
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+
 $trips = [];
 
 // 3. Načtení výletů
