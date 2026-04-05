@@ -1,20 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VÝLETOS</title>
+    <title>VÝLETOS - Výlety</title>
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="teacher.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { visibility: hidden; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
     <div class="logo"><a href="teacher.html" class="no-style-link">VÝLETOS</a></div>
+    <div class="search-box">
+        <input type="text" placeholder="Vyhledejte výlet...">
+        <button type="button">hledat</button>
+    </div>
     <ul class="menu">
-        <li><button onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
+        <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
         <li><button>Moje výlety</button></li>
         <li><button>Oblíbené výlety</button></li>
+        <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
          <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
 

@@ -94,7 +94,7 @@
                 }).format(trip.cena || 0);
                 
                 card.innerHTML = `
-                    <a href="trip-detail.html?id=${trip.id}" style="text-decoration: none; color: inherit;">
+                    <a href="trip_detail.html?id=${trip.id}" style="text-decoration: none; color: inherit;">
                         <h2 class="trip-card-title">${escapeHtml(trip.nazev)}</h2>
                         <div class="trip-card-info">
                             <div class="trip-card-row">

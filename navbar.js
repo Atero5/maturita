@@ -3,10 +3,6 @@ function toggleMenu() {
     menu.classList.toggle("hidden");
 }
 
-function logout() {
-    alert("Odhlášen");
-}
-
 // Zavření dropdownu při kliknutí mimo
 window.onclick = function(event) {
     if (!event.target.matches('.user-menu button')) {
