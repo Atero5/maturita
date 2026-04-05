@@ -24,12 +24,21 @@ if ($conn->connect_error) {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ========== GET detail – načtení jednoho výletu pro úpravu ==========
+// ========== GET detail – načtení jednoho výletu ==========
 if ($method === 'GET' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
 
-    $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+    // Učitel/admin vidí vlastní výlety, student vidí výlety přiřazené jeho třídě
+    if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
+        $stmt = $conn->prepare("SELECT v.* FROM " . $env['TRIPS_TABLE'] . " v INNER JOIN vylety_tridy vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
+        $stmt->bind_param("is", $id, $_SESSION['class']);
+    } elseif ($_SESSION['role'] === 'admin') {
+        $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
+        $stmt->bind_param("i", $id);
+    } else {
+        $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+        $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+    }
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -202,13 +211,7 @@ if ($method === 'DELETE') {
     }
     $check->close();
 
-    // Smazání přiřazených tříd
-    $stmt = $conn->prepare("DELETE FROM vylety_tridy WHERE vyletId = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-
-    // Smazání výletu
+    // Smažání výletu (CASCADE smaže i výlety_tridy a trip_photos)
     $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
     $stmt->bind_param("ii", $id, $_SESSION['user_id']);
 
@@ -236,7 +239,8 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         v.celkova_cena,
         v.misto_odjezdu_tam,
         v.cas_odjezdu_tam,
-        v.dopravni_prostredek_tam
+        v.dopravni_prostredek_tam,
+        v.cas_odjezdu_zpet
     FROM " . $env['TRIPS_TABLE'] . " v
     INNER JOIN vylety_tridy vt ON v.vyletId = vt.vyletId
     WHERE vt.tridy = ?
@@ -257,7 +261,8 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         celkova_cena,
         misto_odjezdu_tam,
         cas_odjezdu_tam,
-        dopravni_prostredek_tam
+        dopravni_prostredek_tam,
+        cas_odjezdu_zpet
     FROM " . $env['TRIPS_TABLE'] . " 
     WHERE userId = ?
     ORDER BY vyletId DESC";
@@ -277,7 +282,8 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         celkova_cena,
         misto_odjezdu_tam,
         cas_odjezdu_tam,
-        dopravni_prostredek_tam
+        dopravni_prostredek_tam,
+        cas_odjezdu_zpet
     FROM " . $env['TRIPS_TABLE'] . " 
     ORDER BY vyletId DESC";
 
@@ -294,7 +300,8 @@ if ($result && $result->num_rows > 0) {
             'adresa' => $row['adresa_ubytovani'],
             'misto' => $row['misto_odjezdu_tam'],
             'cas' => $row['cas_odjezdu_tam'],
-            'doprava' => $row['dopravni_prostredek_tam']
+            'doprava' => $row['dopravni_prostredek_tam'],
+            'cas_odjezdu_zpet' => $row['cas_odjezdu_zpet']
         ];
     }
 }

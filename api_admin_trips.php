@@ -143,13 +143,7 @@ elseif ($method === 'DELETE') {
         exit();
     }
 
-    // Nejprve smažeme přiřazené třídy
-    $stmt = $conn->prepare("DELETE FROM vylety_tridy WHERE vyletId = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-
-    // Pak smažeme výlet
+    // Smažání výletu (CASCADE smaže i výlety_tridy a trip_photos)
     $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
     $stmt->bind_param("i", $id);
 

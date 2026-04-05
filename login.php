@@ -12,6 +12,8 @@ if ($conn->connect_error) {
     die("Chyba připojení: " . $conn->connect_error);
 }
 
+$conn->set_charset("utf8mb4");
+
 // Kontrola, že přišla data z formuláře
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
