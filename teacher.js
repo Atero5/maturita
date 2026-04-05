@@ -51,24 +51,32 @@ function renderTripsCards(trips) {
         }).format(trip.cena || 0);
         
         card.innerHTML = `
-            <a href="trip-detail.html?id=${trip.id}" style="text-decoration: none; color: inherit;">
-                <h2 class="trip-card-title">${escapeHtml(trip.nazev)}</h2>
-                <div class="trip-card-info">
-                    <div class="trip-card-row">
-                        <span class="trip-card-label">Délka pobytu:</span>
-                        <span class="trip-card-value">${escapeHtml(trip.delka_pobytu || 'N/A')}</span>
+            <div class="trip-card-main">
+                <a href="trip-detail.html?id=${trip.id}" style="text-decoration: none; color: inherit;">
+                    <h2 class="trip-card-title">${escapeHtml(trip.nazev)}</h2>
+                    <div class="trip-card-info">
+                        <div class="trip-card-row">
+                            <span class="trip-card-label">Délka pobytu:</span>
+                            <span class="trip-card-value">${escapeHtml(trip.delka_pobytu || 'N/A')}</span>
+                        </div>
+                        <div class="trip-card-row">
+                            <span class="trip-card-label">Místo odjezdu:</span>
+                            <span class="trip-card-value">${escapeHtml(trip.misto || 'N/A')}</span>
+                        </div>
+                        <div class="trip-card-row">
+                            <span class="trip-card-label">Čas odjezdu:</span>
+                            <span class="trip-card-value">${escapeHtml(trip.cas || 'N/A')}</span>
+                        </div>
                     </div>
-                    <div class="trip-card-row">
-                        <span class="trip-card-label">Místo odjezdu:</span>
-                        <span class="trip-card-value">${escapeHtml(trip.misto || 'N/A')}</span>
+                    <div class="trip-card-footer">
+                        <div class="trip-card-price">Cena: ${cenaFormatted}</div>
+                        <div class="trip-card-actions">
+                            <button type="button" class="trip-card-button trip-card-button-edit" onclick="editTrip(event, ${trip.id})">Upravit</button>
+                            <button type="button" class="trip-card-button trip-card-button-delete" onclick="deleteTrip(event, ${trip.id})">Smazat</button>
+                        </div>
                     </div>
-                    <div class="trip-card-row">
-                        <span class="trip-card-label">Čas odjezdu:</span>
-                        <span class="trip-card-value">${escapeHtml(trip.cas || 'N/A')}</span>
-                    </div>
-                </div>
-                <div class="trip-card-price">Cena: ${cenaFormatted}</div>
-            </a>
+                </a>
+            </div>
         `;
         
         container.appendChild(card);
@@ -95,6 +103,21 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Funkce pro úpravu výletu
+function editTrip(event, tripId) {
+    event.stopPropagation(); // Zastaví propagaci události na rodičovské prvky
+    window.location.href = `Change_trip.html?id=${tripId}`;
+}
+
+// Funkce pro smazání výletu (zatím jen placeholder)
+function deleteTrip(event, tripId) {
+    event.stopPropagation(); // Zastaví propagaci události na rodičovské prvky
+    if (confirm('Opravdu chcete smazat tento výlet?')) {
+        // Zde bude logika pro smazání výletu
+        console.log('Smazat výlet s ID:', tripId);
+    }
 }
 
 checkTeacherAuth();

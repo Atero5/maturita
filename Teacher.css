@@ -86,13 +86,60 @@ h1 {
     font-weight: 500;
 }
 
+.trip-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
 .trip-card-price {
     font-size: 16px;
     color: #007bff;
     font-weight: 700;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0;
+    margin: 0;
+}
+
+.trip-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.trip-card-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.trip-card-button:hover {
+    transform: translateY(-1px);
+}
+
+.trip-card-button-edit {
+    background-color: #ffffff;
+    color: #007bff;
+    border: 1px solid #007bff;
+}
+
+.trip-card-button-edit:hover {
+    background-color: #e7f0ff;
+}
+
+.trip-card-button-delete {
+    background-color: #ff4d4f;
+    color: white;
+}
+
+.trip-card-button-delete:hover {
+    background-color: #e04345;
 }
 
 /* Responsive design */
