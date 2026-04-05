@@ -139,7 +139,7 @@ function escapeHtml(text) {
 // Funkce pro úpravu výletu
 function editTrip(event, tripId) {
     event.stopPropagation(); // Zastaví propagaci události na rodičovské prvky
-    window.location.href = `Change_trip.html?id=${tripId}`;
+    window.location.href = `change_trip.html?id=${tripId}`;
 }
 
 // Funkce pro smazání výletu

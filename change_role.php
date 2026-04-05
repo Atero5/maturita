@@ -28,6 +28,6 @@ $stmt->close();
 $conn->close();
 
 // zpět do admin panelu
-header("Location: Admin.html");
+header("Location: admin.html");
 exit();
 ?>

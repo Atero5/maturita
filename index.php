@@ -5,16 +5,16 @@ session_start();
 if (isset($_SESSION['user_id'])) {
     // Redirect based on role
     if ($_SESSION['role'] === 'admin') {
-        header("Location: Admin.html");
+        header("Location: admin.html");
     } elseif ($_SESSION['role'] === 'teacher') {
-        header("Location: Teacher.html");
+        header("Location: teacher.html");
     } else {
-        header("Location: User.html");
+        header("Location: user.html");
     }
     exit();
 } else {
     // Not logged in, redirect to login page
-    header("Location: Login.html");
+    header("Location: login.html");
     exit();
 }
 ?>

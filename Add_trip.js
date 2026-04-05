@@ -56,7 +56,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     .then(data => {
         if (data.success) {
             alert(data.message);
-            window.location.href = 'Teacher.html';
+            window.location.href = 'teacher.html';
         } else {
             alert(data.message || 'Chyba při ukládání výletu');
         }

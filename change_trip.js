@@ -37,7 +37,7 @@ const tripId = urlParams.get('id');
 
 if (!tripId) {
     alert('Neplatný výlet');
-    window.location.href = 'Teacher.html';
+    window.location.href = 'teacher.html';
 }
 
 // Načtení dat výletu a předvyplnění formuláře
@@ -48,7 +48,7 @@ async function loadTripData() {
 
         if (!data.success) {
             alert(data.message || 'Výlet nenalezen');
-            window.location.href = 'Teacher.html';
+            window.location.href = 'teacher.html';
             return;
         }
 
@@ -100,7 +100,7 @@ async function loadTripData() {
     } catch (error) {
         console.error('Chyba při načítání výletu:', error);
         alert('Chyba při načítání výletu');
-        window.location.href = 'Teacher.html';
+        window.location.href = 'teacher.html';
     }
 }
 
@@ -169,7 +169,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     .then(data => {
         if (data.success) {
             alert('Výlet byl úspěšně upraven');
-            window.location.href = 'Teacher.html';
+            window.location.href = 'teacher.html';
         } else {
             alert(data.message || 'Chyba při úpravě výletu');
         }
