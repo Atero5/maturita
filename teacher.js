@@ -66,6 +66,13 @@ function filterAndRenderTrips() {
     }
 }
 
+function formatDateTime(value) {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    if (isNaN(date)) return value;
+    return date.toLocaleString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 function renderTripsCards(trips) {
     const container = document.getElementById('tripsContainer');
     container.innerHTML = '';
@@ -96,7 +103,7 @@ function renderTripsCards(trips) {
                         </div>
                         <div class="trip-card-row">
                             <span class="trip-card-label">Čas odjezdu:</span>
-                            <span class="trip-card-value">${escapeHtml(trip.cas || 'N/A')}</span>
+                            <span class="trip-card-value">${escapeHtml(formatDateTime(trip.cas))}</span>
                         </div>
                     </div>
                 </a>
