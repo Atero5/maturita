@@ -7,7 +7,7 @@ async function checkTeacherAuth() {
         if (!data.authenticated || (data.role !== 'teacher' && data.role !== 'admin')) {
             window.location.href = "login.html";
         } else {
-            // Pokud je to učitel, vypíšeme e-mail
+            // Pokud je to učitel, vypíše e-mail
             document.getElementById('user-email').textContent = data.email;
             document.body.style.visibility = 'visible';
             

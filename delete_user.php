@@ -4,7 +4,7 @@ session_start();
 // Load environment variables
 $env = parse_ini_file(__DIR__ . '/.env');
 
-// 🔒 jen admin
+// jen admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.html");
     exit();
@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 
 $id = $_GET['id'];
 
-// ❗ zabránění smazání sebe sama
+// zabránění smazání sebe sama
 if ($id == $_SESSION['user_id']) {
     die("Nemůžeš smazat sám sebe!");
 }

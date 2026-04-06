@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Nastavíme, že vracíme JSON
+// vrací JSON
 header('Content-Type: application/json');
 
 $response = [

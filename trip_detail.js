@@ -133,7 +133,7 @@ function renderDetail(trip) {
 
     container.innerHTML = `
         <h1 class="trip-title">${escapeHtml(trip.nazev_vyletu || 'Bez názvu')}</h1>
-
+        <hr>
         <!-- Základní info -->
         <div class="detail-section">
             <h2 class="detail-section-title">Základní informace</h2>

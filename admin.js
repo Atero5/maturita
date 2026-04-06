@@ -12,10 +12,10 @@
 
             const data = await response.json();
 
-            // 1. Nastavíme email admina
+            // 1. email admina
             document.getElementById('admin-email').textContent = data.admin_email;
 
-            // 2. Vygenerujeme řádky tabulky
+            // 2.  řádky tabulky
             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = ''; // Vyčistit tabulku
 
@@ -41,7 +41,7 @@
                 tableBody.innerHTML += row;
             });
 
-            // 3. Generujeme pagination controls
+            // 3.  pagination controls
             generatePagination(data.total, data.limit);
 
             // 4. Zobrazíme stránku
@@ -79,7 +79,7 @@
         document.getElementById('pagination-controls').innerHTML = controls;
     }
 
-    // Spustíme načítání
+    // načítání
     loadAdminData();
 
     // ========== VÝLETY ==========

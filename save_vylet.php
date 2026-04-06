@@ -5,13 +5,13 @@ header('Content-Type: application/json');
 // Load environment variables
 $env = parse_ini_file(__DIR__ . '/.env');
 
-// 1. Ochrana – jen přihlášený uživatel může ukládat
+// Ochrana – jen přihlášený uživatel může ukládat
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Chyba: Nejste přihlášen.']);
     exit;
 }
 
-// 2. Připojení k databázi
+// Připojení k databázi
 $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 $conn->set_charset("utf8mb4");
 
@@ -20,7 +20,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-// 3. Načtení dat z POST (používáme ternární operátor, aby v DB nebyly chyby, když je pole prázdné)
+// Načtení dat z POST (používám ternární operátor, aby v DB nebyly chyby, když je pole prázdné)
 $nazev_vyletu = $_POST['nazev_vyletu'] ?? '';
 $adresa_ubytovani = $_POST['adresa_ubytovani'] ?? null;
 $delka_pobytu = $_POST['delka_pobytu'] ?? null;
@@ -58,7 +58,7 @@ $cas_vecere = $_POST['cas_vecere'] ?? null;
 $cena = !empty($_POST['celkova_cena']) ? $_POST['celkova_cena'] : 0;
 $cislo_uctu = $_POST['cislo_uctu'] ?? null;
 
-// 4. Příprava SQL dotazu (Prepared Statement)
+// Příprava SQL dotazu (Prepared Statement)
 $sql = "INSERT INTO " . $env['TRIPS_TABLE'] . " (
     userId, nazev_vyletu, adresa_ubytovani, delka_pobytu, 
     misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, 
@@ -84,7 +84,7 @@ $stmt->bind_param(
     $cena, $cislo_uctu
 );
 
-// 5. Provedení a odeslání výsledku zpět do HTML
+// Provedení a odeslání výsledku zpět do HTML
 if ($stmt->execute()) {
     // Uložení tříd do tabulky vylety_tridy
     $vylet_id = $conn->insert_id;

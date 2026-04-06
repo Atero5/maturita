@@ -19,21 +19,21 @@ body{
 hr {
     border: 0;
     border-top: 2px solid black;
-    width: 95%;       /* nebo 100% podle potřeby */
-    display: block;   /* nutné pro správné blokové chování */
+    width: 95%;       
+    display: block;   
     margin-bottom: 30px;
 }
 
 .field{
-    width: 220px;           /* stejné / lehce větší než input */
+    width: 220px;           
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* 👈 zarovnání k levému okraji */
+    align-items: flex-start; 
     margin-bottom: 10px;
 }
 
 .field h3{
-    margin: 0 0 5px 5px;    /* 👈 blíž k inputu */
+    margin: 0 0 5px 5px;    
     font-size: 14px;
 }
 

@@ -5,14 +5,14 @@ header('Content-Type: application/json');
 // Load environment variables
 $env = parse_ini_file(__DIR__ . '/.env');
 
-// 1. Kontrola: Uživatel musí být přihlášen
+// Kontrola: Uživatel musí být přihlášen
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Nepovolený přístup']);
     exit();
 }
 
-// 2. Připojení k databázi
+// Připojení k databázi
 $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 $conn->set_charset("utf8mb4");
 

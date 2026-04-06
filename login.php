@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['role'] = $role;
         $_SESSION['class'] = $class;
 
-        // 🔥 Přesměrování podle role
+        // Přesměrování podle role
         header("Location: index.php");
         exit();
     } else {
