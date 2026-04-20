@@ -12,16 +12,12 @@
 <body>
     <nav class="navbar">
     <div class="logo"><a href="teacher.html" class="no-style-link">VÝLETOS</a></div>
-    <div class="search-box">
-        <input type="text" placeholder="Vyhledejte výlet...">
-        <button type="button">hledat</button>
-    </div>
     <ul class="menu">
         <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
         <li><button>Moje výlety</button></li>
-        <li><button>Oblíbené výlety</button></li>
         <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
-         <li class="user-menu">
+        <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
+        <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
 
                 <div id="userDropdown" class="dropdown hidden">

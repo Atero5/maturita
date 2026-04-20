@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.page-content {
+    max-width: 1200px;
+    margin: 70px auto 20px auto;
+    padding: 0 20px;
+}
+
+.white-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+.white-box h1 {
+    text-align: center;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.white-box hr {
+    border: none;
+    border-top: 2px solid #3498db;
+    margin: 20px 0;
+}
+
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+#calendarWidget {
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: white;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background-color: #e7f0ff;
+}
+
+.calendar-day.active {
+    background-color: #3498db;
+    color: white;
+}
+
+.calendar-day.other-month {
+    background-color: #f5f5f5;
+    color: #999;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.calendar-header h2 {
+    flex-grow: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.calendar-header button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.calendar-header button:hover {
+    background-color: #2980b9;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.calendar-weekday {
+    color: #666;
+    padding: 10px 0;
+}

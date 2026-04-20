@@ -15,16 +15,11 @@
 <body>
     <nav class="navbar">
         <div class="logo"><a href="teacher.html" class="no-style-link">VÝLETOS</a></div>
-        <div class="search-box">
-            <input type="text" placeholder="Vyhledejte výlet...">
-            <button type="button">hledat</button>
-        </div>
-
         <ul class="menu">
             <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
             <li><button type="button">Moje výlety</button></li>
-            <li><button type="button">Oblíbené výlety</button></li>
             <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
+            <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
             <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
 
@@ -63,21 +58,37 @@
         <h3>Délka pobytu</h3>
         <input type="text" name="delka_pobytu" placeholder="Zadejte délku..." required>
 
+        <h3>Harmonogram</h3>
+        <textarea name="harmonogram" placeholder="Zadejte harmonogram výletu..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
+
+        <h3>Učitelé na výletě</h3>
+        <textarea name="uciitele" placeholder="Zadejte seznam učitelů..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
+
         <h2>Doprava tam</h2>
         <h3>Místo odjezdu</h3>
         <input type="text" name="misto_odjezdu_tam" placeholder="Zadejte místo..." required>
-        <h3>Čas odjezdu</h3>
+        <h3>Datum a čas odjezdu</h3>
         <input type="datetime-local" name="cas_odjezdu_tam" required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_tam" placeholder="Zadejte prostředek..." required>
+        <select class="input" name="dopravni_prostredek_tam" required>
+            <option value="">-- Vyberte --</option>
+            <option value="autobus">Autobus</option>
+            <option value="vlak">Vlak</option>
+            <option value="jine">Jiné</option>
+        </select>
 
         <h2>Doprava zpět</h2>
         <h3>Místo odjezdu</h3>
         <input type="text" name="misto_odjezdu_zpet" placeholder="Zadejte místo..." required>
-        <h3>Čas odjezdu</h3>
+        <h3>Datum a čas odjezdu</h3>
         <input type="datetime-local" name="cas_odjezdu_zpet" required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_zpet" placeholder="Zadejte prostředek..." required>
+        <select class="input" name="dopravni_prostredek_zpet" required>
+            <option value="">-- Vyberte --</option>
+            <option value="autobus">Autobus</option>
+            <option value="vlak">Vlak</option>
+            <option value="jine">Jiné</option>
+        </select>
 
         <h2>Stravování</h2>
 
@@ -86,7 +97,7 @@
             <input type="radio" name="typ_snidane" value="restaurace" data-target="BreakfastBox" required> restaurace
         </label><br>
         <label>
-            <input type="radio" name="typ_snidane" value="vlastni"> vlastní
+            <input type="radio" name="typ_snidane" value="vlastni" data-target="BreakfastCustom"> vlastní
         </label>
 
         <div id="BreakfastBox" class="hidden">
@@ -94,8 +105,14 @@
             <input type="text" name="nazev_restaurace_snidane" placeholder="Zadejte restauraci...">
             <h3>Adresa restaurace</h3>
             <input type="text" name="adresa_restaurace_snidane" placeholder="Zadejte adresu...">
+            <h3>Kontakt na restauraci</h3>
+            <input type="text" name="kontakt_restaurace_snidane" placeholder="Zadejte kontakt...">
             <h3>Čas snídaně</h3>
             <input type="text" name="cas_snidane" placeholder="Zadejte čas...">
+        </div>
+        <div id="BreakfastCustom" class="hidden">
+            <h3>Vlastní snídaně</h3>
+            <textarea name="vlastni_snidane" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
         </div>
 
         <h3>Oběd</h3>
@@ -103,7 +120,7 @@
             <input type="radio" name="typ_obeda" value="restaurace" data-target="LunchBox" required> restaurace
         </label><br>
         <label>
-            <input type="radio" name="typ_obeda" value="vlastni"> vlastní
+            <input type="radio" name="typ_obeda" value="vlastni" data-target="LunchCustom"> vlastní
         </label>
 
         <div id="LunchBox" class="hidden">
@@ -111,8 +128,14 @@
             <input type="text" name="nazev_restaurace_obed" placeholder="Zadejte restauraci...">
             <h3>Adresa restaurace</h3>
             <input type="text" name="adresa_restaurace_obed" placeholder="Zadejte adresu...">
+            <h3>Kontakt na restauraci</h3>
+            <input type="text" name="kontakt_restaurace_obed" placeholder="Zadejte kontakt...">
             <h3>Čas oběda</h3>
             <input type="text" name="cas_obeda" placeholder="Zadejte čas...">
+        </div>
+        <div id="LunchCustom" class="hidden">
+            <h3>Vlastní oběd</h3>
+            <textarea name="vlastni_obed" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
         </div>
 
         <h3>Večeře</h3>
@@ -120,7 +143,7 @@
             <input type="radio" name="typ_vecere" value="restaurace" data-target="DinnerBox" required> restaurace
         </label><br>
         <label>
-            <input type="radio" name="typ_vecere" value="vlastni"> vlastní
+            <input type="radio" name="typ_vecere" value="vlastni" data-target="DinnerCustom"> vlastní
         </label>
 
         <div id="DinnerBox" class="hidden">
@@ -128,8 +151,14 @@
             <input type="text" name="nazev_restaurace_vecere" placeholder="Zadejte restauraci...">
             <h3>Adresa restaurace</h3>
             <input type="text" name="adresa_restaurace_vecere" placeholder="Zadejte adresu...">
+            <h3>Kontakt na restauraci</h3>
+            <input type="text" name="kontakt_restaurace_vecere" placeholder="Zadejte kontakt...">
             <h3>Čas večeře</h3>
             <input type="text" name="cas_vecere" placeholder="Zadejte čas...">
+        </div>
+        <div id="DinnerCustom" class="hidden">
+            <h3>Vlastní večeře</h3>
+            <textarea name="vlastni_vecere" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
         </div>
 
         <h2>Cena</h2>
