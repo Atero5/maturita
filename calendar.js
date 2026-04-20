@@ -21,6 +21,53 @@ function initializeCalendar() {
     let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
     
     renderCalendar(currentDate);
+    setupTaskHandlers();
+    loadAllTasks();
+}
+
+// Obsluha tlačítka pro vytvoření úkolu
+function setupTaskHandlers() {
+    document.querySelector('.btn-create-task').addEventListener('click', function() {
+        const taskName = document.getElementById('taskName').value.trim();
+        const endTime = document.getElementById('taskEndTime').value;
+        if (!taskName || !endTime) {
+            alert('Zadejte název úkolu a koncový čas.');
+            return;
+        }
+        fetch('api_tasks.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task: taskName, end_time: endTime })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('taskName').value = '';
+                document.getElementById('taskEndTime').value = '';
+                loadAllTasks();
+            } else {
+                alert('Chyba při ukládání úkolu.');
+            }
+        })
+        .catch(err => console.error('Chyba:', err));
+    });
+}
+
+// Načtení a zobrazení všech úkolů učitele
+function loadAllTasks() {
+    fetch('api_tasks.php')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('tasksContainer');
+            if (data.success && data.tasks.length > 0) {
+                container.innerHTML = '<ul>' + data.tasks.map(t =>
+                    `<li><strong>${t.task}</strong> – ${t.end_time}</li>`
+                ).join('') + '</ul>';
+            } else {
+                container.innerHTML = '<p>Žádné úkoly.</p>';
+            }
+        })
+        .catch(err => console.error('Chyba:', err));
 }
 
 // Vykreslení kalendáře

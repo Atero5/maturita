@@ -14,11 +14,12 @@ if ($conn->connect_error) {
 $email = $_POST['email'];
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
-$class = $_POST['class'];
 $role = $_POST['role'];
 
+$class = $role == "teacher" ? null : $_POST['class'];
+
 // Kontrola, zda jsou pole vyplněná
-if (empty($email) || empty($password) || empty($confirm_password) || empty($class) || empty($role)) {
+if (empty($email) || empty($password) || empty($confirm_password) || empty($role) || ($role != "teacher" && empty($class))) {
     die("Všechna pole musí být vyplněna.");
 }
 
