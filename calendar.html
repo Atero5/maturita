@@ -16,7 +16,7 @@
         <div class="logo"><a href="teacher.html" class="no-style-link">VÝLETOS</a></div>
         <ul class="menu">
             <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
-            <li><button type="button">Moje výlety</button></li>
+            <li><button type="button">výlety</button></li>
             <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
             <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'" class="active-nav">Kalendář</button></li>
             <li class="user-menu">
@@ -32,13 +32,35 @@
 
     <main class="page-content">
         <section class="white-box">
-            <h1>Kalendář výletů</h1>
+            <h1>Kalendář</h1>
             <hr>
             
             <div class="calendar-container">
                 <div id="calendarWidget">
                     <p style="text-align:center; color:#999;">Načítání...</p>
                 </div>
+                <aside class="task-panel">
+                    <div class="task-panel-header">
+                        <h2>Úkoly</h2>
+                    </div>
+                    <div class="task-panel-body">
+                        <div class="task-field">
+                            <label for="taskName">Název úkolu</label>
+                            <input type="text" id="taskName" placeholder="Zadejte název úkolu">
+                        </div>
+                        <div class="task-field">
+                            <label for="taskEndTime">Koncový čas</label>
+                            <input type="time" id="taskEndTime">
+                        </div>
+                        <button class="btn-create-task" type="button">Vytvořit úkol</button>
+                        <div class="tasks-list">
+                            <h3>Seznam úkolů</h3>
+                            <div id="tasksContainer" class="tasks-placeholder">
+                                <p>Úkoly uvidíte zde.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </section>
     </main>

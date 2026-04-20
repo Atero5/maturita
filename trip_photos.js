@@ -12,6 +12,7 @@ let isOwner = false;
 let userRole = '';
 let firstLoad = true;
 let uploadReady = false;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 async function init() {
     try {
@@ -128,9 +129,15 @@ let pendingFiles = [];
 function setupUpload() {
     const fileInput = document.getElementById('fileInput');
     fileInput.addEventListener('change', function () {
+        const status = document.getElementById('uploadStatus');
+        status.innerHTML = '';
         if (!this.files || this.files.length === 0) return;
 
         for (const file of this.files) {
+            if (file.size > MAX_FILE_SIZE) {
+                status.innerHTML = '<span style="color:#dc3545;">Soubor "' + escapeHtml(file.name) + '" je příliš velký (max 10 MB).</span>';
+                continue;
+            }
             pendingFiles.push(file);
         }
 

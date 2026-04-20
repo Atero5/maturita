@@ -96,10 +96,10 @@ if ($method === 'POST') {
     }
 
     $file = $_FILES['photo'];
-    $maxSize = 5 * 1024 * 1024; // 5 MB
+    $maxSize = 10 * 1024 * 1024; // 10 MB
 
     if ($file['size'] > $maxSize) {
-        echo json_encode(['success' => false, 'message' => 'Soubor je příliš velký (max 5 MB)']);
+        echo json_encode(['success' => false, 'message' => 'Soubor je příliš velký (max 10 MB)']);
         exit();
     }
 
