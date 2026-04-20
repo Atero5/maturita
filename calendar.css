@@ -32,7 +32,8 @@ body {
 .white-box hr {
     border: none;
     border-top: 2px solid #3498db;
-    margin: 20px 0;
+    margin: 20px -30px;
+    width: calc(100% + 60px);
 }
 
 .calendar-container {
@@ -221,12 +222,171 @@ body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     font-weight: bold;
     text-align: center;
 }
 
 .calendar-weekday {
     color: #666;
-    padding: 10px 0;
+    padding: 10px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.day-number {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.task-count {
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.calendar-day {
+    position: relative;
+}
+
+.day-details {
+    margin-top: 10px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.day-tasks {
+    min-height: 50px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.assigned-task {
+    background-color: #3498db;
+    color: white;
+    padding: 5px;
+    margin: 2px 0;
+    border-radius: 4px;
+    cursor: move;
+    font-size: 12px;
+}
+
+.tasks-placeholder ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tasks-placeholder li {
+    background-color: #f0f0f0;
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+    cursor: move;
+}
+
+.day-view-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.btn-back {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-back:hover {
+    background-color: #2980b9;
+}
+
+.day-view-header h2 {
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.day-view-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Drag and drop styly */
+[draggable="true"] {
+    user-select: none;
+    -webkit-user-drag: element;
+}
+
+[draggable="true"]:hover {
+    opacity: 0.9;
+}
+
+.tasks-placeholder ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tasks-placeholder li[draggable="true"] {
+    background-color: #e8f4f8;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 6px;
+    cursor: grab;
+    border-left: 4px solid #3498db;
+    transition: all 0.2s ease;
+}
+
+.tasks-placeholder li[draggable="true"]:hover {
+    background-color: #d1e7f0;
+    transform: translateX(2px);
+}
+
+.tasks-placeholder li[draggable="true"]:active {
+    cursor: grabbing;
+    opacity: 0.7;
+}
+
+.assigned-task {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 6px;
+    cursor: grab;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.assigned-task:hover {
+    background-color: #2980b9;
+    transform: translateX(2px);
+}
+
+.assigned-task:active {
+    cursor: grabbing;
+    opacity: 0.8;
 }
