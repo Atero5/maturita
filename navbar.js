@@ -15,7 +15,7 @@ window.onclick = function(event) {
 
 async function setupMyTripsButton() {
     const buttons = document.querySelectorAll('.menu button');
-    const myTripsButton = Array.from(buttons).find(btn => btn.textContent.trim() === 'výlety');
+    const myTripsButton = Array.from(buttons).find(btn => btn.textContent.trim() === 'Výlety');
     if (!myTripsButton) return;
 
     myTripsButton.addEventListener('click', async () => {

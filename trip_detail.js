@@ -24,10 +24,10 @@ async function init() {
         // Nastavení logo linku podle role
         const logoLink = document.getElementById('logo-link');
         if (userRole === 'teacher' || userRole === 'admin') {
-            logoLink.href = 'teacher.html';
+            logoLink.href = 'home_teacher.html';
             document.getElementById('navAddTrip').style.display = '';
         } else {
-            logoLink.href = 'user.html';
+            logoLink.href = 'home_user.html';
         }
 
         // Tlačítko zpět
@@ -85,38 +85,50 @@ function mealBadge(type) {
     return '<span class="meal-badge meal-badge-own">Vlastní</span>';
 }
 
-function renderMealSection(title, type, restaurant, address, time) {
-    let html = `
-        <div class="detail-section">
-            <h2 class="detail-section-title">${title}</h2>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Typ</span>
-                    <span class="detail-value">${mealBadge(type)}</span>
-                </div>
-    `;
+const mealLabel = { snidane: 'Snídáně', obed: 'Oběd', vecere: 'Večeře' };
 
-    if (type === 'restaurace') {
-        html += `
-                <div class="detail-item">
-                    <span class="detail-label">Restaurace</span>
-                    <span class="detail-value">${escapeHtml(restaurant || '—')}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Adresa restaurace</span>
-                    <span class="detail-value">${escapeHtml(address || '—')}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Čas</span>
-                    <span class="detail-value">${escapeHtml(time || '—')}</span>
-                </div>
-        `;
-    }
+function renderStravaSection(strava) {
+    if (!strava || strava.length === 0) return '';
 
-    html += `
-            </div>
-        </div>
-    `;
+    // Group by day
+    const byDay = {};
+    strava.forEach(s => {
+        if (!byDay[s.den]) byDay[s.den] = [];
+        byDay[s.den].push(s);
+    });
+
+    const mealIcon = { snidane: '☀️', obed: '🍽️', vecere: '🌙' };
+
+    let html = '<div class="detail-section"><h2 class="detail-section-title">Stravování</h2>';
+    Object.keys(byDay).sort((a, b) => a - b).forEach(den => {
+        html += `<div class="strava-day">`;
+        html += `<div class="strava-day-header">Den ${escapeHtml(String(den))}</div>`;
+        html += '<div class="strava-meals">';
+        byDay[den].forEach(meal => {
+            const icon = mealIcon[meal.typ_jidla] || '';
+            const label = mealLabel[meal.typ_jidla] || meal.typ_jidla;
+            html += `<div class="strava-meal-card">`;
+            html += `<div class="strava-meal-header">${icon} <span class="strava-meal-name">${escapeHtml(label)}</span>${mealBadge(meal.typ)}</div>`;
+
+            if (meal.typ === 'restaurace') {
+                // Rozbalovací detaily restaurace
+                html += `<details class="strava-restaurant-details">`;
+                html += `<summary>Zobrazit detaily restaurace</summary>`;
+                html += `<div class="strava-restaurant-info">`;
+                if (meal.nazev_restaurace) html += `<div class="strava-info-row"><span class="strava-info-label">Název:</span> <span>${escapeHtml(meal.nazev_restaurace)}</span></div>`;
+                if (meal.adresa_restaurace) html += `<div class="strava-info-row"><span class="strava-info-label">Adresa:</span> <span>${escapeHtml(meal.adresa_restaurace)}</span></div>`;
+                if (meal.kontakt_restaurace) html += `<div class="strava-info-row"><span class="strava-info-label">Kontakt:</span> <span>${escapeHtml(meal.kontakt_restaurace)}</span></div>`;
+                if (meal.cas) html += `<div class="strava-info-row"><span class="strava-info-label">Čas:</span> <span>${escapeHtml(meal.cas)}</span></div>`;
+                html += `</div></details>`;
+            } else if (meal.vlastni_text) {
+                html += `<div class="strava-meal-detail">${escapeHtml(meal.vlastni_text)}</div>`;
+            }
+
+            html += `</div>`;
+        });
+        html += '</div></div>';
+    });
+    html += '</div>';
     return html;
 }
 
@@ -150,9 +162,21 @@ function renderDetail(trip) {
                     <span class="detail-label">Třídy</span>
                     <span class="detail-value">${tridyHtml || '—'}</span>
                 </div>
+                <div class="detail-item">
+                    <span class="detail-label">Učitelé</span>
+                    <span class="detail-value">${escapeHtml(trip.uciitele || '—')}</span>
+                </div>
             </div>
             ${mapUrl ? `<iframe class="detail-map" src="${mapUrl}" allowfullscreen></iframe>` : ''}
         </div>
+
+        <!-- Harmonogram -->
+        ${trip.harmonogram ? `
+        <div class="detail-section">
+            <h2 class="detail-section-title">Harmonogram</h2>
+            <div class="detail-harmonogram">${escapeHtml(trip.harmonogram).replace(/\n/g, '<br>')}</div>
+        </div>
+        ` : ''}
 
         <!-- Doprava tam -->
         <div class="detail-section">
@@ -193,9 +217,7 @@ function renderDetail(trip) {
         </div>
 
         <!-- Stravování -->
-        ${renderMealSection('Snídaně', trip.typ_snidane, trip.nazev_restaurace_snidane, trip.adresa_restaurace_snidane, trip.cas_snidane)}
-        ${renderMealSection('Oběd', trip.typ_obeda, trip.nazev_restaurace_obed, trip.adresa_restaurace_obed, trip.cas_obeda)}
-        ${renderMealSection('Večeře', trip.typ_vecere, trip.nazev_restaurace_vecere, trip.adresa_restaurace_vecere, trip.cas_vecere)}
+        ${renderStravaSection(trip.strava)}
 
         <!-- Cena -->
         <div class="detail-section">

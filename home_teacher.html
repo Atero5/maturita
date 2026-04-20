@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÝLETOS</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="hidden.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>body { visibility: hidden; }</style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="home_teacher.html" class="no-style-link">VÝLETOS</a></div>
+        <ul class="menu">
+            <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
+            <li><button type="button">Výlety</button></li>
+            <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
+            <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
+            <li class="user-menu">
+                <button type="button" onclick="toggleMenu()">Profil</button>
+                <div id="userDropdown" class="dropdown hidden">
+                    <p>Přihlášen jako: <span id="user-email">... načítání</span></p>
+                    <button class="logout-link" onclick="window.location.href='logout.php'">Odhlásit</button>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <script src="navbar.js"></script>
+    <script>
+        fetch('api_auth.php')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.authenticated || (data.role !== 'teacher' && data.role !== 'admin')) {
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('user-email').textContent = data.email;
+                    document.body.style.visibility = 'visible';
+                }
+            })
+            .catch(() => window.location.href = 'login.html');
+    </script>
+</body>
+</html>

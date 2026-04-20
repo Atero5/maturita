@@ -14,10 +14,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo"><a href="teacher.html" class="no-style-link">VÝLETOS</a></div>
+        <div class="logo"><a href="home_teacher.html" class="no-style-link">VÝLETOS</a></div>
         <ul class="menu">
             <li><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
-            <li><button type="button">výlety</button></li>
+            <li><button type="button">Výlety</button></li>
             <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
             <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
             <li class="user-menu">
@@ -31,154 +31,133 @@
         </ul>
     </nav>
 
-    <form action="save_vylet.php" method="POST">
+    <form action="save_vylet.php" method="POST" id="tripForm" novalidate>
         <button type="button" class="btn-back" onclick="window.history.back()">&larr; Zpět</button>
         <h1>Přidání výletu</h1>
-        
-        <h2>Základní informace</h2>
-        <h3>Název výletu</h3>
-        <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
-        
-        <h3>Adresa ubytování</h3>
-        <div class="address-container">
-            <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu..." required>
-            <button type="button" onclick="zobrazMapu()">Zobrazit na mapě</button>
-        </div>
-        
 
-        <br><br>
-
-        <iframe class="hidden"
-            id="mapa"
-            width="100%"
-            height="500"
-            style="border:1px solid black;">
-        </iframe>
-
-        <h3>Délka pobytu</h3>
-        <input type="text" name="delka_pobytu" placeholder="Zadejte délku..." required>
-
-        <h3>Harmonogram</h3>
-        <textarea name="harmonogram" placeholder="Zadejte harmonogram výletu..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
-
-        <h3>Učitelé na výletě</h3>
-        <textarea name="uciitele" placeholder="Zadejte seznam učitelů..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
-
-        <h2>Doprava tam</h2>
-        <h3>Místo odjezdu</h3>
-        <input type="text" name="misto_odjezdu_tam" placeholder="Zadejte místo..." required>
-        <h3>Datum a čas odjezdu</h3>
-        <input type="datetime-local" name="cas_odjezdu_tam" required>
-        <h3>Dopravní prostředek</h3>
-        <select class="input" name="dopravni_prostredek_tam" required>
-            <option value="">-- Vyberte --</option>
-            <option value="autobus">Autobus</option>
-            <option value="vlak">Vlak</option>
-            <option value="jine">Jiné</option>
-        </select>
-
-        <h2>Doprava zpět</h2>
-        <h3>Místo odjezdu</h3>
-        <input type="text" name="misto_odjezdu_zpet" placeholder="Zadejte místo..." required>
-        <h3>Datum a čas odjezdu</h3>
-        <input type="datetime-local" name="cas_odjezdu_zpet" required>
-        <h3>Dopravní prostředek</h3>
-        <select class="input" name="dopravni_prostredek_zpet" required>
-            <option value="">-- Vyberte --</option>
-            <option value="autobus">Autobus</option>
-            <option value="vlak">Vlak</option>
-            <option value="jine">Jiné</option>
-        </select>
-
-        <h2>Stravování</h2>
-
-        <h3>Snídaně</h3>
-        <label>
-            <input type="radio" name="typ_snidane" value="restaurace" data-target="BreakfastBox" required> restaurace
-        </label><br>
-        <label>
-            <input type="radio" name="typ_snidane" value="vlastni" data-target="BreakfastCustom"> vlastní
-        </label>
-
-        <div id="BreakfastBox" class="hidden">
-            <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_snidane" placeholder="Zadejte restauraci...">
-            <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_snidane" placeholder="Zadejte adresu...">
-            <h3>Kontakt na restauraci</h3>
-            <input type="text" name="kontakt_restaurace_snidane" placeholder="Zadejte kontakt...">
-            <h3>Čas snídaně</h3>
-            <input type="text" name="cas_snidane" placeholder="Zadejte čas...">
-        </div>
-        <div id="BreakfastCustom" class="hidden">
-            <h3>Vlastní snídaně</h3>
-            <textarea name="vlastni_snidane" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
+        <!-- Navigační lišta kroků -->
+        <div class="step-tabs">
+            <button type="button" class="step-tab active" data-step="1">1. Základní informace</button>
+            <button type="button" class="step-tab" data-step="2">2. Strava</button>
+            <button type="button" class="step-tab" data-step="3">3. Cena</button>
         </div>
 
-        <h3>Oběd</h3>
-        <label>
-            <input type="radio" name="typ_obeda" value="restaurace" data-target="LunchBox" required> restaurace
-        </label><br>
-        <label>
-            <input type="radio" name="typ_obeda" value="vlastni" data-target="LunchCustom"> vlastní
-        </label>
+        <!-- KROK 1: Základní informace -->
+        <div class="form-step active" id="step-1">
+            <h2>Základní informace</h2>
+            <h3>Název výletu</h3>
+            <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
+            
+            <h3>Adresa ubytování</h3>
+            <div class="address-container">
+                <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu..." required>
+                <button type="button" onclick="zobrazMapu()">Zobrazit na mapě</button>
+            </div>
 
-        <div id="LunchBox" class="hidden">
-            <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_obed" placeholder="Zadejte restauraci...">
-            <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_obed" placeholder="Zadejte adresu...">
-            <h3>Kontakt na restauraci</h3>
-            <input type="text" name="kontakt_restaurace_obed" placeholder="Zadejte kontakt...">
-            <h3>Čas oběda</h3>
-            <input type="text" name="cas_obeda" placeholder="Zadejte čas...">
+            <br><br>
+
+            <iframe class="hidden"
+                id="mapa"
+                width="100%"
+                height="500"
+                style="border:1px solid black;">
+            </iframe>
+
+            <h3>Délka pobytu</h3>
+            <select class="input" name="delka_pobytu" id="delkaPobytu" required>
+                <option value="">-- Vyberte --</option>
+                <option value="1 den">1 den</option>
+                <option value="2 dny">2 dny</option>
+                <option value="3 dny">3 dny</option>
+                <option value="4 dny">4 dny</option>
+                <option value="5 dní">5 dní</option>
+                <option value="jine">Jiné</option>
+            </select>
+            <div id="delkaPobytuCustom" class="hidden">
+                <input type="text" name="delka_pobytu_custom" placeholder="Zadejte vlastní délku...">
+            </div>
+
+            <h3>Harmonogram</h3>
+            <textarea name="harmonogram" placeholder="Zadejte harmonogram výletu..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
+
+            <h3>Učitelé na výletě</h3>
+            <div class="teacher-select-wrapper">
+                <div class="teacher-selected" id="selectedTeachers"></div>
+                <select id="teacherDropdown" class="input">
+                    <option value="">-- Vyberte učitele --</option>
+                </select>
+                <input type="hidden" name="uciitele" id="uciteleHidden">
+            </div>
+
+            <h2>Doprava tam</h2>
+            <h3>Místo odjezdu</h3>
+            <input type="text" name="misto_odjezdu_tam" placeholder="Zadejte místo..." required>
+            <h3>Datum a čas odjezdu</h3>
+            <input type="datetime-local" name="cas_odjezdu_tam" required>
+            <h3>Dopravní prostředek</h3>
+            <select class="input" name="dopravni_prostredek_tam" id="dopravaTam" required>
+                <option value="">-- Vyberte --</option>
+                <option value="autobus">Autobus</option>
+                <option value="vlak">Vlak</option>
+                <option value="jine">Jiné</option>
+            </select>
+            <div id="dopravaTamCustom" class="hidden">
+                <input type="text" name="dopravni_prostredek_tam_custom" placeholder="Zadejte dopravní prostředek...">
+            </div>
+
+            <h2>Doprava zpět</h2>
+            <h3>Místo odjezdu</h3>
+            <input type="text" name="misto_odjezdu_zpet" placeholder="Zadejte místo..." required>
+            <h3>Datum a čas odjezdu</h3>
+            <input type="datetime-local" name="cas_odjezdu_zpet" required>
+            <h3>Dopravní prostředek</h3>
+            <select class="input" name="dopravni_prostredek_zpet" id="dopravaZpet" required>
+                <option value="">-- Vyberte --</option>
+                <option value="autobus">Autobus</option>
+                <option value="vlak">Vlak</option>
+                <option value="jine">Jiné</option>
+            </select>
+            <div id="dopravaZpetCustom" class="hidden">
+                <input type="text" name="dopravni_prostredek_zpet_custom" placeholder="Zadejte dopravní prostředek...">
+            </div>
+
+            <br><br>
+            <button type="button" class="btn-next" onclick="goToStep(2)">Další →</button>
         </div>
-        <div id="LunchCustom" class="hidden">
-            <h3>Vlastní oběd</h3>
-            <textarea name="vlastni_obed" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
+
+        <!-- KROK 2: Strava -->
+        <div class="form-step" id="step-2">
+            <h2>Stravování</h2>
+            <p id="stravaInfo" style="text-align:center; color:#888;">Strava se vygeneruje podle délky pobytu.</p>
+            <div id="stravaContainer"></div>
+
+            <br><br>
+            <button type="button" class="btn-prev" onclick="goToStep(1)">← Zpět</button>
+            <button type="button" class="btn-next" onclick="goToStep(3)">Další →</button>
         </div>
 
-        <h3>Večeře</h3>
-        <label>
-            <input type="radio" name="typ_vecere" value="restaurace" data-target="DinnerBox" required> restaurace
-        </label><br>
-        <label>
-            <input type="radio" name="typ_vecere" value="vlastni" data-target="DinnerCustom"> vlastní
-        </label>
+        <!-- KROK 3: Cena -->
+        <div class="form-step" id="step-3">
+            <h2>Cena</h2>
+            <h3>Celková cena</h3>
+            <input type="text" name="celkova_cena" placeholder="Zadejte cenu..." required>
+            <h3>Číslo účtu</h3>
+            <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu..." required>
 
-        <div id="DinnerBox" class="hidden">
-            <h3>Název restaurace</h3>
-            <input type="text" name="nazev_restaurace_vecere" placeholder="Zadejte restauraci...">
-            <h3>Adresa restaurace</h3>
-            <input type="text" name="adresa_restaurace_vecere" placeholder="Zadejte adresu...">
-            <h3>Kontakt na restauraci</h3>
-            <input type="text" name="kontakt_restaurace_vecere" placeholder="Zadejte kontakt...">
-            <h3>Čas večeře</h3>
-            <input type="text" name="cas_vecere" placeholder="Zadejte čas...">
+            <h3>Třídy na výlet</h3>
+            <div class="classes-grid">
+                <label><input type="checkbox" name="tridy[]" value="V4A"> V4A</label>
+                <label><input type="checkbox" name="tridy[]" value="V4B"> V4B</label>
+                <label><input type="checkbox" name="tridy[]" value="V4C"> V4C</label>
+                <label><input type="checkbox" name="tridy[]" value="S4A"> S4A</label>
+                <label><input type="checkbox" name="tridy[]" value="S4B"> S4B</label>
+                <label><input type="checkbox" name="tridy[]" value="S4C"> S4C</label>
+            </div>
+
+            <br><br>
+            <button type="button" class="btn-prev" onclick="goToStep(2)">← Zpět</button>
+            <button type="submit">Potvrdit a odeslat výlet</button>
         </div>
-        <div id="DinnerCustom" class="hidden">
-            <h3>Vlastní večeře</h3>
-            <textarea name="vlastni_vecere" placeholder="Zadejte seznam..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="4"></textarea>
-        </div>
-
-        <h2>Cena</h2>
-        <h3>Celková cena</h3>
-        <input type="text" name="celkova_cena" placeholder="Zadejte cenu..." required>
-        <h3>Číslo účtu</h3>
-        <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu..." required>
-
-        <h3>Třídy na výlet</h3>
-        <div class="classes-grid">
-            <label><input type="checkbox" name="tridy[]" value="V4A"> V4A</label>
-            <label><input type="checkbox" name="tridy[]" value="V4B"> V4B</label>
-            <label><input type="checkbox" name="tridy[]" value="V4C"> V4C</label>
-            <label><input type="checkbox" name="tridy[]" value="S4A"> S4A</label>
-            <label><input type="checkbox" name="tridy[]" value="S4B"> S4B</label>
-            <label><input type="checkbox" name="tridy[]" value="S4C"> S4C</label>
-        </div>
-
-        <br><br>
-        <button type="submit" >Potvrdit a odeslat výlet</button>
     </form>
     <script src="add_trip.js"></script>
     <script src="navbar.js"></script>

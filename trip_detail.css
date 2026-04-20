@@ -137,12 +137,124 @@ body {
 }
 
 /* Stravování typ badge */
+/* Harmonogram */
+.detail-harmonogram {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.7;
+    white-space: pre-line;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+/* Strava - dny */
+.strava-day {
+    margin-bottom: 20px;
+}
+
+.strava-day-header {
+    font-size: 15px;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e7f0ff;
+}
+
+.strava-meals {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.strava-meal-card {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.strava-meal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.strava-meal-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.strava-meal-detail {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Restaurace - rozbalovací detaily */
+.strava-restaurant-details {
+    margin-top: 8px;
+}
+
+.strava-restaurant-details summary {
+    font-size: 13px;
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 500;
+    user-select: none;
+    list-style: none;
+}
+
+.strava-restaurant-details summary::before {
+    content: '▶ ';
+    font-size: 10px;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.strava-restaurant-details[open] summary::before {
+    content: '▼ ';
+}
+
+.strava-restaurant-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.strava-restaurant-info {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.strava-info-row {
+    font-size: 13px;
+    color: #333;
+}
+
+.strava-info-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 70px;
+    display: inline-block;
+}
+
+/* Badge typ jídla */
 .meal-badge {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 2px 10px;
     border-radius: 12px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
+    margin-left: auto;
 }
 
 .meal-badge-restaurant {

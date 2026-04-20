@@ -11,33 +11,13 @@ function zobrazMapu() {
     mapa.classList.remove("hidden");
 }
 
-// Přepínání skrytých polí pro restauraci
-const radios = document.querySelectorAll("input[type=radio]");
-radios.forEach(radio => {
-    radio.addEventListener("change", function(){
-        const group = document.querySelectorAll(`input[name="${this.name}"]`);
-        group.forEach(r => {
-            if(r.dataset.target){
-                const box = document.getElementById(r.dataset.target);
-                box.classList.add("hidden");
-                box.querySelectorAll("input").forEach(input => input.required = false);
-            }
-        });
-        if(this.dataset.target){
-            const box = document.getElementById(this.dataset.target);
-            box.classList.remove("hidden");
-            box.querySelectorAll("input").forEach(input => input.required = true);
-        }
-    });
-});
-
 // Získání ID výletu z URL
 const urlParams = new URLSearchParams(window.location.search);
 const tripId = urlParams.get('id');
 
 if (!tripId) {
     alert('Neplatný výlet');
-    window.location.href = 'teacher.html';
+    window.location.href = 'home_teacher.html';
 }
 
 // Načtení dat výletu a předvyplnění formuláře
@@ -48,7 +28,7 @@ async function loadTripData() {
 
         if (!data.success) {
             alert(data.message || 'Výlet nenalezen');
-            window.location.href = 'teacher.html';
+            window.location.href = 'home_teacher.html';
             return;
         }
 
@@ -59,6 +39,12 @@ async function loadTripData() {
         document.querySelector('input[name="adresa_ubytovani"]').value = trip.adresa_ubytovani || '';
         document.querySelector('input[name="delka_pobytu"]').value = trip.delka_pobytu || '';
 
+        // Harmonogram
+        document.querySelector('textarea[name="harmonogram"]').value = trip.harmonogram || '';
+
+        // Učitelé
+        document.querySelector('input[name="uciitele"]').value = trip.uciitele || '';
+
         // Doprava tam
         document.querySelector('input[name="misto_odjezdu_tam"]').value = trip.misto_odjezdu_tam || '';
         document.querySelector('input[name="cas_odjezdu_tam"]').value = trip.cas_odjezdu_tam || '';
@@ -68,24 +54,6 @@ async function loadTripData() {
         document.querySelector('input[name="misto_odjezdu_zpet"]').value = trip.misto_odjezdu_zpet || '';
         document.querySelector('input[name="cas_odjezdu_zpet"]').value = trip.cas_odjezdu_zpet || '';
         document.querySelector('input[name="dopravni_prostredek_zpet"]').value = trip.dopravni_prostredek_zpet || '';
-
-        // Stravování - snídaně
-        setRadioAndBox('typ_snidane', trip.typ_snidane, 'BreakfastBox');
-        document.querySelector('input[name="nazev_restaurace_snidane"]').value = trip.nazev_restaurace_snidane || '';
-        document.querySelector('input[name="adresa_restaurace_snidane"]').value = trip.adresa_restaurace_snidane || '';
-        document.querySelector('input[name="cas_snidane"]').value = trip.cas_snidane || '';
-
-        // Stravování - oběd
-        setRadioAndBox('typ_obeda', trip.typ_obeda, 'LunchBox');
-        document.querySelector('input[name="nazev_restaurace_obed"]').value = trip.nazev_restaurace_obed || '';
-        document.querySelector('input[name="adresa_restaurace_obed"]').value = trip.adresa_restaurace_obed || '';
-        document.querySelector('input[name="cas_obeda"]').value = trip.cas_obeda || '';
-
-        // Stravování - večeře
-        setRadioAndBox('typ_vecere', trip.typ_vecere, 'DinnerBox');
-        document.querySelector('input[name="nazev_restaurace_vecere"]').value = trip.nazev_restaurace_vecere || '';
-        document.querySelector('input[name="adresa_restaurace_vecere"]').value = trip.adresa_restaurace_vecere || '';
-        document.querySelector('input[name="cas_vecere"]').value = trip.cas_vecere || '';
 
         // Cena
         document.querySelector('input[name="celkova_cena"]').value = trip.celkova_cena || '';
@@ -100,23 +68,8 @@ async function loadTripData() {
     } catch (error) {
         console.error('Chyba při načítání výletu:', error);
         alert('Chyba při načítání výletu');
-        window.location.href = 'teacher.html';
+        window.location.href = 'home_teacher.html';
     }
-}
-
-// Nastavení radio buttonu a zobrazení/skrytí boxu
-function setRadioAndBox(radioName, value, boxId) {
-    const radios = document.querySelectorAll(`input[name="${radioName}"]`);
-    radios.forEach(radio => {
-        if (radio.value === value) {
-            radio.checked = true;
-            if (radio.dataset.target) {
-                const box = document.getElementById(radio.dataset.target);
-                box.classList.remove('hidden');
-                box.querySelectorAll('input').forEach(input => input.required = true);
-            }
-        }
-    });
 }
 
 // Odeslání upraveného výletu
@@ -137,24 +90,14 @@ document.querySelector('form').addEventListener('submit', function(e) {
         nazev_vyletu: document.querySelector('input[name="nazev_vyletu"]').value,
         adresa_ubytovani: document.querySelector('input[name="adresa_ubytovani"]').value,
         delka_pobytu: document.querySelector('input[name="delka_pobytu"]').value,
+        harmonogram: document.querySelector('textarea[name="harmonogram"]').value,
+        uciitele: document.querySelector('input[name="uciitele"]').value,
         misto_odjezdu_tam: document.querySelector('input[name="misto_odjezdu_tam"]').value,
         cas_odjezdu_tam: document.querySelector('input[name="cas_odjezdu_tam"]').value,
         dopravni_prostredek_tam: document.querySelector('input[name="dopravni_prostredek_tam"]').value,
         misto_odjezdu_zpet: document.querySelector('input[name="misto_odjezdu_zpet"]').value,
         cas_odjezdu_zpet: document.querySelector('input[name="cas_odjezdu_zpet"]').value,
         dopravni_prostredek_zpet: document.querySelector('input[name="dopravni_prostredek_zpet"]').value,
-        typ_snidane: document.querySelector('input[name="typ_snidane"]:checked')?.value || 'vlastni',
-        nazev_restaurace_snidane: document.querySelector('input[name="nazev_restaurace_snidane"]').value,
-        adresa_restaurace_snidane: document.querySelector('input[name="adresa_restaurace_snidane"]').value,
-        cas_snidane: document.querySelector('input[name="cas_snidane"]').value,
-        typ_obeda: document.querySelector('input[name="typ_obeda"]:checked')?.value || 'vlastni',
-        nazev_restaurace_obed: document.querySelector('input[name="nazev_restaurace_obed"]').value,
-        adresa_restaurace_obed: document.querySelector('input[name="adresa_restaurace_obed"]').value,
-        cas_obeda: document.querySelector('input[name="cas_obeda"]').value,
-        typ_vecere: document.querySelector('input[name="typ_vecere"]:checked')?.value || 'vlastni',
-        nazev_restaurace_vecere: document.querySelector('input[name="nazev_restaurace_vecere"]').value,
-        adresa_restaurace_vecere: document.querySelector('input[name="adresa_restaurace_vecere"]').value,
-        cas_vecere: document.querySelector('input[name="cas_vecere"]').value,
         celkova_cena: document.querySelector('input[name="celkova_cena"]').value,
         cislo_uctu: document.querySelector('input[name="cislo_uctu"]').value,
         tridy: tridy

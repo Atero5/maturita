@@ -54,6 +54,17 @@ if ($method === 'GET' && isset($_GET['id'])) {
         }
         $tridyStmt->close();
 
+        // Načtení stravy z vylety_strava
+        $stravaStmt = $conn->prepare("SELECT den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text FROM vylety_strava WHERE vyletId = ? ORDER BY den, FIELD(typ_jidla, 'snidane', 'obed', 'vecere')");
+        $stravaStmt->bind_param("i", $id);
+        $stravaStmt->execute();
+        $stravaResult = $stravaStmt->get_result();
+        $strava = [];
+        while ($s = $stravaResult->fetch_assoc()) {
+            $strava[] = $s;
+        }
+        $stravaStmt->close();
+
         echo json_encode([
             'success' => true,
             'trip' => [
@@ -67,20 +78,12 @@ if ($method === 'GET' && isset($_GET['id'])) {
                 'misto_odjezdu_zpet' => $row['misto_odjezdu_zpet'],
                 'cas_odjezdu_zpet' => $row['cas_odjezdu_zpet'],
                 'dopravni_prostredek_zpet' => $row['dopravni_prostredek_zpet'],
-                'typ_snidane' => $row['typ_snidane'],
-                'nazev_restaurace_snidane' => $row['nazev_restaurace_snidane'],
-                'adresa_restaurace_snidane' => $row['adresa_restaurace_snidane'],
-                'cas_snidane' => $row['cas_snidane'],
-                'typ_obeda' => $row['typ_obeda'],
-                'nazev_restaurace_obed' => $row['nazev_restaurace_obed'],
-                'adresa_restaurace_obed' => $row['adresa_restaurace_obed'],
-                'cas_obeda' => $row['cas_obeda'],
-                'typ_vecere' => $row['typ_vecere'],
-                'nazev_restaurace_vecere' => $row['nazev_restaurace_vecere'],
-                'adresa_restaurace_vecere' => $row['adresa_restaurace_vecere'],
-                'cas_vecere' => $row['cas_vecere'],
+                'harmonogram' => $row['harmonogram'],
+                'uciitele' => $row['uciitele'],
                 'celkova_cena' => $row['celkova_cena'],
                 'cislo_uctu' => $row['cislo_uctu'],
+                'datum_vytvoreni' => $row['datum_vytvoreni'],
+                'strava' => $strava,
                 'tridy' => $tridy
             ]
         ]);
@@ -125,18 +128,8 @@ if ($method === 'PUT') {
     $misto_zpet = $input['misto_odjezdu_zpet'] ?? '';
     $cas_zpet = $input['cas_odjezdu_zpet'] ?? '';
     $doprava_zpet = $input['dopravni_prostredek_zpet'] ?? '';
-    $typ_snidane = $input['typ_snidane'] ?? 'vlastni';
-    $nazev_rest_snid = $input['nazev_restaurace_snidane'] ?? null;
-    $adr_rest_snid = $input['adresa_restaurace_snidane'] ?? null;
-    $cas_snidane = $input['cas_snidane'] ?? null;
-    $typ_obeda = $input['typ_obeda'] ?? 'vlastni';
-    $nazev_rest_obed = $input['nazev_restaurace_obed'] ?? null;
-    $adr_rest_obed = $input['adresa_restaurace_obed'] ?? null;
-    $cas_obeda = $input['cas_obeda'] ?? null;
-    $typ_vecere = $input['typ_vecere'] ?? 'vlastni';
-    $nazev_rest_vece = $input['nazev_restaurace_vecere'] ?? null;
-    $adr_rest_vece = $input['adresa_restaurace_vecere'] ?? null;
-    $cas_vecere = $input['cas_vecere'] ?? null;
+    $harmonogram = $input['harmonogram'] ?? null;
+    $ucitele = $input['uciitele'] ?? null;
     $cena = !empty($input['celkova_cena']) ? $input['celkova_cena'] : 0;
     $cislo_uctu = $input['cislo_uctu'] ?? null;
 
@@ -144,19 +137,15 @@ if ($method === 'PUT') {
         nazev_vyletu = ?, adresa_ubytovani = ?, delka_pobytu = ?,
         misto_odjezdu_tam = ?, cas_odjezdu_tam = ?, dopravni_prostredek_tam = ?,
         misto_odjezdu_zpet = ?, cas_odjezdu_zpet = ?, dopravni_prostredek_zpet = ?,
-        typ_snidane = ?, nazev_restaurace_snidane = ?, adresa_restaurace_snidane = ?, cas_snidane = ?,
-        typ_obeda = ?, nazev_restaurace_obed = ?, adresa_restaurace_obed = ?, cas_obeda = ?,
-        typ_vecere = ?, nazev_restaurace_vecere = ?, adresa_restaurace_vecere = ?, cas_vecere = ?,
+        harmonogram = ?, uciitele = ?,
         celkova_cena = ?, cislo_uctu = ?
         WHERE vyletId = ? AND userId = ?");
     $stmt->bind_param(
-        "sssssssssssssssssssssdsii",
+        "sssssssssssdsii",
         $nazev, $adresa, $delka,
         $misto_tam, $cas_tam, $doprava_tam,
         $misto_zpet, $cas_zpet, $doprava_zpet,
-        $typ_snidane, $nazev_rest_snid, $adr_rest_snid, $cas_snidane,
-        $typ_obeda, $nazev_rest_obed, $adr_rest_obed, $cas_obeda,
-        $typ_vecere, $nazev_rest_vece, $adr_rest_vece, $cas_vecere,
+        $harmonogram, $ucitele,
         $cena, $cislo_uctu,
         $id, $_SESSION['user_id']
     );

@@ -7,9 +7,9 @@ if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
         header("Location: admin.html");
     } elseif ($_SESSION['role'] === 'teacher') {
-        header("Location: teacher.html");
+        header("Location: home_teacher.html");
     } else {
-        header("Location: user.html");
+        header("Location: home_user.html");
     }
     exit();
 } else {

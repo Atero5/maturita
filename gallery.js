@@ -16,10 +16,10 @@ async function init() {
 
         const logoLink = document.getElementById('logo-link');
         if (userRole === 'teacher' || userRole === 'admin') {
-            logoLink.href = 'teacher.html';
+            logoLink.href = 'home_teacher.html';
             document.getElementById('navAddTrip').style.display = '';
         } else {
-            logoLink.href = 'user.html';
+            logoLink.href = 'home_user.html';
         }
 
         document.body.style.visibility = 'visible';
