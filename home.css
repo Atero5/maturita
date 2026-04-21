@@ -60,3 +60,46 @@ body {
     font-size: 16px;
     font-weight: 600;
 }
+
+.welcome-box {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    margin: 40px auto;
+    max-width: 900px;
+    text-align: left;
+}
+
+.welcome-box h2 {
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.welcome-box p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #555;
+    margin: 16px 0;
+}
+
+.welcome-btn {
+    display: block;
+    margin: 32px auto 0 auto;
+    padding: 12px 36px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s;
+}
+.welcome-btn:hover {
+    background-color: #2176b6;
+}
