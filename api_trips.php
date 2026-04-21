@@ -30,7 +30,7 @@ if ($method === 'GET' && isset($_GET['id'])) {
 
     // Učitel/admin vidí vlastní výlety, student vidí výlety přiřazené jeho třídě
     if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
-        $stmt = $conn->prepare("SELECT v.* FROM " . $env['TRIPS_TABLE'] . " v INNER JOIN vylety_tridy vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
+        $stmt = $conn->prepare("SELECT v.* FROM " . $env['TRIPS_TABLE'] . " v INNER JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
         $stmt->bind_param("is", $id, $_SESSION['class']);
     } elseif ($_SESSION['role'] === 'admin') {
         $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
@@ -44,7 +44,7 @@ if ($method === 'GET' && isset($_GET['id'])) {
 
     if ($row = $result->fetch_assoc()) {
         // Načtení tříd
-        $tridyStmt = $conn->prepare("SELECT tridy FROM vylety_tridy WHERE vyletId = ?");
+        $tridyStmt = $conn->prepare("SELECT tridy FROM " . $env['TRIPS_CLASSES_TABLE'] . " WHERE vyletId = ?");
         $tridyStmt->bind_param("i", $id);
         $tridyStmt->execute();
         $tridyResult = $tridyStmt->get_result();
@@ -55,7 +55,7 @@ if ($method === 'GET' && isset($_GET['id'])) {
         $tridyStmt->close();
 
         // Načtení stravy z vylety_strava
-        $stravaStmt = $conn->prepare("SELECT den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text FROM vylety_strava WHERE vyletId = ? ORDER BY den, FIELD(typ_jidla, 'snidane', 'obed', 'vecere')");
+        $stravaStmt = $conn->prepare("SELECT den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text FROM " . $env['TRIPS_MEALS_TABLE'] . " WHERE vyletId = ? ORDER BY den, FIELD(typ_jidla, 'snidane', 'obed', 'vecere')");
         $stravaStmt->bind_param("i", $id);
         $stravaStmt->execute();
         $stravaResult = $stravaStmt->get_result();
@@ -152,14 +152,14 @@ if ($method === 'PUT') {
 
     if ($stmt->execute()) {
         // Aktualizace tříd
-        $delTridy = $conn->prepare("DELETE FROM vylety_tridy WHERE vyletId = ?");
+        $delTridy = $conn->prepare("DELETE FROM " . $env['TRIPS_CLASSES_TABLE'] . " WHERE vyletId = ?");
         $delTridy->bind_param("i", $id);
         $delTridy->execute();
         $delTridy->close();
 
         $tridy = $input['tridy'] ?? [];
         foreach ($tridy as $trida) {
-            $ins = $conn->prepare("INSERT INTO vylety_tridy (vyletId, tridy) VALUES (?, ?)");
+            $ins = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
             $ins->bind_param("is", $id, $trida);
             $ins->execute();
             $ins->close();
@@ -229,9 +229,10 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         v.misto_odjezdu_tam,
         v.cas_odjezdu_tam,
         v.dopravni_prostredek_tam,
-        v.cas_odjezdu_zpet
+        v.cas_odjezdu_zpet,
+        (SELECT COUNT(*) FROM " . $env['PHOTOS_TABLE'] . " tp WHERE tp.vyletId = v.vyletId) AS photo_count
     FROM " . $env['TRIPS_TABLE'] . " v
-    INNER JOIN vylety_tridy vt ON v.vyletId = vt.vyletId
+    INNER JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId
     WHERE vt.tridy = ?
     ORDER BY v.vyletId DESC";
 
@@ -251,7 +252,8 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         misto_odjezdu_tam,
         cas_odjezdu_tam,
         dopravni_prostredek_tam,
-        cas_odjezdu_zpet
+        cas_odjezdu_zpet,
+        (SELECT COUNT(*) FROM " . $env['PHOTOS_TABLE'] . " tp WHERE tp.vyletId = " . $env['TRIPS_TABLE'] . ".vyletId) AS photo_count
     FROM " . $env['TRIPS_TABLE'] . " 
     WHERE userId = ?
     ORDER BY vyletId DESC";
@@ -272,7 +274,8 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         misto_odjezdu_tam,
         cas_odjezdu_tam,
         dopravni_prostredek_tam,
-        cas_odjezdu_zpet
+        cas_odjezdu_zpet,
+        (SELECT COUNT(*) FROM " . $env['PHOTOS_TABLE'] . " tp WHERE tp.vyletId = " . $env['TRIPS_TABLE'] . ".vyletId) AS photo_count
     FROM " . $env['TRIPS_TABLE'] . " 
     ORDER BY vyletId DESC";
 
@@ -290,7 +293,8 @@ if ($result && $result->num_rows > 0) {
             'misto' => $row['misto_odjezdu_tam'],
             'cas' => $row['cas_odjezdu_tam'],
             'doprava' => $row['dopravni_prostredek_tam'],
-            'cas_odjezdu_zpet' => $row['cas_odjezdu_zpet']
+            'cas_odjezdu_zpet' => $row['cas_odjezdu_zpet'],
+            'photo_count' => (int)($row['photo_count'] ?? 0)
         ];
     }
 }

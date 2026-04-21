@@ -59,10 +59,10 @@
         <input type="text" name="delka_pobytu" placeholder="Zadejte délku..." required>
 
         <h3>Harmonogram</h3>
-        <textarea name="harmonogram" placeholder="Zadejte harmonogram výletu..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif; resize: vertical;" rows="6"></textarea>
+        <textarea name="harmonogram" class="textarea-field" placeholder="Zadejte harmonogram výletu..." rows="6"></textarea>
 
         <h3>Učitelé na výletě</h3>
-        <input type="text" name="uciitele" placeholder="E-maily učitelů oddělené čárkou..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 15px; font-family: 'Inter', Arial, sans-serif;">
+        <input type="text" name="uciitele" placeholder="E-maily učitelů oddělené čárkou...">
 
         <h2>Doprava tam</h2>
         <h3>Místo odjezdu</h3>
@@ -82,9 +82,9 @@
 
         <h2>Cena</h2>
         <h3>Celková cena</h3>
-        <input type="text" name="celkova_cena" placeholder="Zadejte cenu..." required>
+        <input type="number" name="celkova_cena" placeholder="Zadejte cenu v Kč..." min="0" step="1" required>
         <h3>Číslo účtu</h3>
-        <input type="text" name="cislo_uctu" placeholder="Zadejte číslo účtu..." required>
+        <input type="text" name="cislo_uctu" placeholder="Např. 123456789/0100" pattern="^\d{2,10}\/\d{4}$" title="Formát: Čísloúčtu/Kódbanka (např. 123456/0100)" required>
 
         <h3>Třídy na výlet</h3>
         <div class="classes-grid">
@@ -97,7 +97,7 @@
         </div>
 
         <br><br>
-        <button type="submit" >Potvrdit a upravit výlet</button>
+        <button type="submit" id="submitBtn">Potvrdit a upravit výlet</button>
     </form>
     <script src="change_trip.js"></script>
     <script src="navbar.js"></script>

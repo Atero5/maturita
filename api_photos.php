@@ -37,7 +37,7 @@ if ($method === 'GET' && isset($_GET['vyletId'])) {
 
     $stmt = $conn->prepare("
         SELECT p.photoId, p.filename, p.uploaded_at, p.userId, u.email 
-        FROM trip_photos p 
+        FROM " . $env['PHOTOS_TABLE'] . " p 
         JOIN " . $env['USER_TABLE'] . " u ON p.userId = u.userId 
         WHERE p.vyletId = ? 
         ORDER BY p.uploaded_at DESC
@@ -104,12 +104,12 @@ if ($method === 'POST') {
     }
 
     // Kontrola typu souboru
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mimeType = $finfo->file($file['tmp_name']);
 
     if (!in_array($mimeType, $allowedTypes)) {
-        echo json_encode(['success' => false, 'message' => 'Povolené formáty: JPG, PNG, GIF, WEBP']);
+        echo json_encode(['success' => false, 'message' => 'Povolené formáty: JPG, PNG, WEBP']);
         exit();
     }
 
@@ -130,7 +130,7 @@ if ($method === 'POST') {
     }
 
     // Uložení do DB
-    $stmt = $conn->prepare("INSERT INTO trip_photos (vyletId, userId, filename) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO " . $env['PHOTOS_TABLE'] . " (vyletId, userId, filename) VALUES (?, ?, ?)");
     $stmt->bind_param("iis", $vyletId, $userId, $filename);
     $stmt->execute();
 
@@ -149,7 +149,7 @@ if ($method === 'DELETE') {
     }
 
     // Načíst fotku
-    $stmt = $conn->prepare("SELECT p.photoId, p.vyletId, p.userId, p.filename, v.userId AS ownerId FROM trip_photos p JOIN " . $env['TRIPS_TABLE'] . " v ON p.vyletId = v.vyletId WHERE p.photoId = ?");
+    $stmt = $conn->prepare("SELECT p.photoId, p.vyletId, p.userId, p.filename, v.userId AS ownerId FROM " . $env['PHOTOS_TABLE'] . " p JOIN " . $env['TRIPS_TABLE'] . " v ON p.vyletId = v.vyletId WHERE p.photoId = ?");
     $stmt->bind_param("i", $photoId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -160,8 +160,8 @@ if ($method === 'DELETE') {
         exit();
     }
 
-    // Smazat může: ten kdo nahrál NEBO vlastník výletu (učitel) NEBO admin
-    if ($userId !== (int)$photo['userId'] && $userId !== (int)$photo['ownerId'] && $role !== 'admin') {
+    // Smazat může: ten kdo nahrál NEBO jakýkoliv učitel NEBO admin
+    if ($userId !== (int)$photo['userId'] && $role !== 'teacher' && $role !== 'admin') {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Nemáte oprávnění smazat tuto fotku']);
         exit();
@@ -174,7 +174,7 @@ if ($method === 'DELETE') {
     }
 
     // Smazat z DB
-    $stmt = $conn->prepare("DELETE FROM trip_photos WHERE photoId = ?");
+    $stmt = $conn->prepare("DELETE FROM " . $env['PHOTOS_TABLE'] . " WHERE photoId = ?");
     $stmt->bind_param("i", $photoId);
     $stmt->execute();
 
@@ -194,7 +194,7 @@ function hasAccessToTrip($conn, $env, $vyletId, $userId, $role) {
         $stmt->bind_param("ii", $vyletId, $userId);
     } else {
         $class = $_SESSION['class'] ?? '';
-        $stmt = $conn->prepare("SELECT vt.vyletId FROM vylety_tridy vt WHERE vt.vyletId = ? AND vt.tridy = ?");
+        $stmt = $conn->prepare("SELECT vt.vyletId FROM " . $env['TRIPS_CLASSES_TABLE'] . " vt WHERE vt.vyletId = ? AND vt.tridy = ?");
         $stmt->bind_param("is", $vyletId, $class);
     }
 

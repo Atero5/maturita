@@ -83,12 +83,6 @@ async function loadPhotos() {
 
         renderPhotos(data.photos);
 
-        // Auto-open upload dialog (jen při prvním načtení)
-        if (firstLoad && autoUpload && data.canUpload) {
-            firstLoad = false;
-            document.getElementById('fileInput').click();
-        }
-
     } catch (error) {
         document.getElementById('photosContainer').innerHTML = '<p class="no-photos">Chyba při načítání fotek.</p>';
     }
@@ -96,13 +90,14 @@ async function loadPhotos() {
 
 function renderPhotos(photos) {
     const container = document.getElementById('photosContainer');
+    lightboxPhotos = photos || [];
 
     if (!photos || photos.length === 0) {
         container.innerHTML = '<p class="no-photos">Zatím žádné fotky.</p>';
         return;
     }
 
-    const html = '<div class="photos-grid">' + photos.map(photo => {
+    const html = '<div class="photos-grid">' + photos.map((photo, index) => {
         const canDelete = (currentUserId === parseInt(photo.userId)) || isOwner || userRole === 'admin';
         const deleteBtn = canDelete
             ? `<button class="btn-delete-photo" onclick="deletePhoto(${photo.photoId})" title="Smazat">🗑️</button>`
@@ -112,7 +107,7 @@ function renderPhotos(photos) {
 
         return `
             <div class="photo-card">
-                <img src="${imgSrc}" alt="Fotka" onclick="openLightbox('${imgSrc}', '${escapeHtml(photo.email)}', '${escapeHtml(formatDateTime(photo.uploaded_at))}')">
+                <img src="${imgSrc}" alt="Fotka" onclick="openLightbox(${index})">
                 <div class="photo-card-footer">
                     <span class="photo-author">${escapeHtml(photo.email)}</span>
                     ${deleteBtn}
@@ -125,25 +120,50 @@ function renderPhotos(photos) {
 }
 
 let pendingFiles = [];
+let lightboxPhotos = [];
+let lightboxIndex = 0;
 
 function setupUpload() {
     const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+
     fileInput.addEventListener('change', function () {
-        const status = document.getElementById('uploadStatus');
-        status.innerHTML = '';
-        if (!this.files || this.files.length === 0) return;
-
-        for (const file of this.files) {
-            if (file.size > MAX_FILE_SIZE) {
-                status.innerHTML = '<span style="color:#dc3545;">Soubor "' + escapeHtml(file.name) + '" je příliš velký (max 10 MB).</span>';
-                continue;
-            }
-            pendingFiles.push(file);
-        }
-
-        renderPreview();
+        handleFiles(this.files);
         this.value = '';
     });
+
+    // Drag & drop na upload area
+    uploadArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    });
+    uploadArea.addEventListener('dragleave', function (e) {
+        if (!this.contains(e.relatedTarget)) this.classList.remove('drag-over');
+    });
+    uploadArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) {
+            handleFiles(e.dataTransfer.files);
+        }
+    });
+}
+
+function handleFiles(files) {
+    const status = document.getElementById('uploadStatus');
+    status.innerHTML = '';
+    for (const file of files) {
+        if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+            status.innerHTML = '<span style="color:#dc3545;">Soubor "' + escapeHtml(file.name) + '" není obrázek.</span>';
+            continue;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            status.innerHTML = '<span style="color:#dc3545;">Soubor "' + escapeHtml(file.name) + '" je příliš velký (max 10 MB).</span>';
+            continue;
+        }
+        pendingFiles.push(file);
+    }
+    renderPreview();
 }
 
 function renderPreview() {
@@ -262,10 +282,20 @@ async function deletePhoto(photoId) {
 }
 
 // Lightbox
-function openLightbox(src, author, date) {
-    document.getElementById('lightboxImg').src = src;
-    document.getElementById('lightboxInfo').textContent = 'Nahrál/a: ' + author + ' • ' + date;
+function openLightbox(index) {
+    lightboxIndex = index;
+    const photo = lightboxPhotos[index];
+    const imgSrc = 'uploads/trips/' + tripId + '/' + encodeURIComponent(photo.filename);
+    document.getElementById('lightboxImg').src = imgSrc;
+    document.getElementById('lightboxInfo').textContent = 'Nahrál/a: ' + photo.email + ' • ' + formatDateTime(photo.uploaded_at);
     document.getElementById('lightbox').style.display = 'flex';
+    document.getElementById('lightboxPrev').style.visibility = index > 0 ? 'visible' : 'hidden';
+    document.getElementById('lightboxNext').style.visibility = index < lightboxPhotos.length - 1 ? 'visible' : 'hidden';
+}
+
+function lightboxStep(dir) {
+    const next = lightboxIndex + dir;
+    if (next >= 0 && next < lightboxPhotos.length) openLightbox(next);
 }
 
 function closeLightbox(event) {
@@ -274,9 +304,11 @@ function closeLightbox(event) {
 }
 
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        document.getElementById('lightbox').style.display = 'none';
-    }
+    const lb = document.getElementById('lightbox');
+    if (lb.style.display === 'none') return;
+    if (e.key === 'Escape') lb.style.display = 'none';
+    if (e.key === 'ArrowRight') lightboxStep(1);
+    if (e.key === 'ArrowLeft') lightboxStep(-1);
 });
 
 function formatDateTime(dateStr) {

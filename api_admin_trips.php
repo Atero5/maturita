@@ -75,14 +75,14 @@ if ($method === 'GET') {
     $query = "SELECT v.vyletId, v.nazev_vyletu, v.delka_pobytu, v.celkova_cena, v.misto_odjezdu_tam,
               GROUP_CONCAT(vt.tridy ORDER BY vt.tridy SEPARATOR ', ') as tridy
               FROM " . $env['TRIPS_TABLE'] . " v
-              LEFT JOIN vylety_tridy vt ON v.vyletId = vt.vyletId
+              LEFT JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId
               GROUP BY v.vyletId
               ORDER BY v.vyletId DESC
               LIMIT ? OFFSET ?";
 
     $stmt = $conn->prepare($query);
     if (!$stmt) {
-        // Fallback bez tříd pokud tabulka vylety_tridy neexistuje
+        // Fallback bez tříd pokud tabulka TRIPS_CLASSES_TABLE neexistuje
         $query = "SELECT vyletId, nazev_vyletu, delka_pobytu, celkova_cena, misto_odjezdu_tam
                   FROM " . $env['TRIPS_TABLE'] . "
                   ORDER BY vyletId DESC
@@ -143,7 +143,7 @@ elseif ($method === 'DELETE') {
         exit();
     }
 
-    // Smažání výletu (CASCADE smaže i výlety_tridy a trip_photos)
+    // Smažání výletu (CASCADE smaže i TRIPS_CLASSES_TABLE a PHOTOS_TABLE)
     $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
     $stmt->bind_param("i", $id);
 

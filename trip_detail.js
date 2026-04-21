@@ -145,6 +145,11 @@ function renderDetail(trip) {
 
     container.innerHTML = `
         <h1 class="trip-title">${escapeHtml(trip.nazev_vyletu || 'Bez názvu')}</h1>
+        ${(userRole === 'teacher' || userRole === 'admin') ? `
+        <div class="pdf-actions">
+            <a class="btn-pdf" href="print_harmonogram.php?id=${trip.id}" target="_blank">📄 Harmonogram (PDF)</a>
+            <a class="btn-pdf" href="print_seznam.php?id=${trip.id}" target="_blank">👥 Seznam žáků (PDF)</a>
+        </div>` : ''}
         <hr>
         <!-- Základní info -->
         <div class="detail-section">
@@ -227,7 +232,97 @@ function renderDetail(trip) {
                 <span class="price-account">Číslo účtu: <strong>${escapeHtml(trip.cislo_uctu || '—')}</strong></span>
             </div>
         </div>
+
+        <!-- Odhlášení (student) / Seznam účastníků (učitel) -->
+        <div id="ucastSection"></div>
     `;
+
+    if (userRole === 'student') {
+        loadOdhlaseniStudent();
+    } else if (userRole === 'teacher' || userRole === 'admin') {
+        loadUcastnici();
+    }
+}
+
+async function loadOdhlaseniStudent() {
+    try {
+        const res = await fetch(`api_odhlaseni.php?vyletId=${tripId}`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        renderOdhlaseniBtn(data.odhlasen);
+    } catch (e) { /* tiché selhání */ }
+}
+
+function renderOdhlaseniBtn(odhlasen) {
+    const section = document.getElementById('ucastSection');
+    section.innerHTML = `
+        <div class="detail-section detail-section-odhlaseni">
+            ${odhlasen
+                ? `<p class="odhlaseni-status odhlaseni-status--off">Jsi odhlášen/a z tohoto výletu.</p>
+                   <button class="btn-prihlasit" onclick="prihlasitZpet()">Přihlásit se zpět</button>`
+                : `<p class="odhlaseni-status odhlaseni-status--on">Jsi přihlášen/a na tento výlet.</p>
+                   <button class="btn-odhlasit" onclick="odhlasitSe()">Odhlásit se z výletu</button>`
+            }
+        </div>
+    `;
+}
+
+async function odhlasitSe() {
+    if (!confirm('Opravdu se chceš odhlásit z tohoto výletu?')) return;
+    try {
+        const res = await fetch('api_odhlaseni.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vyletId: parseInt(tripId) })
+        });
+        const data = await res.json();
+        if (data.success) renderOdhlaseniBtn(true);
+        else alert(data.message || 'Chyba při odhlašování');
+    } catch (e) { alert('Chyba při odhlašování'); }
+}
+
+async function prihlasitZpet() {
+    if (!confirm('Chceš se přihlásit zpět na tento výlet?')) return;
+    try {
+        const res = await fetch('api_odhlaseni.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vyletId: parseInt(tripId) })
+        });
+        const data = await res.json();
+        if (data.success) renderOdhlaseniBtn(false);
+        else alert(data.message || 'Chyba');
+    } catch (e) { alert('Chyba'); }
+}
+
+async function loadUcastnici() {
+    try {
+        const res = await fetch(`api_odhlaseni.php?vyletId=${tripId}`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        const section = document.getElementById('ucastSection');
+        const ucastnici = data.ucastnici || [];
+        const odhlaseni = data.odhlaseni || [];
+
+        const renderRow = (s) =>
+            `<div class="ucastnik-row"><span class="ucastnik-class">${escapeHtml(s.class)}</span><span class="ucastnik-email">${escapeHtml(s.email)}</span></div>`;
+
+        section.innerHTML = `
+            <div class="detail-section">
+                <h2 class="detail-section-title">Účastníci (${ucastnici.length})</h2>
+                ${ucastnici.length > 0
+                    ? ucastnici.map(renderRow).join('')
+                    : '<p class="no-ucastnici">Žádní přihlášení žáci</p>'}
+            </div>
+            ${odhlaseni.length > 0 ? `
+            <div class="detail-section">
+                <h2 class="detail-section-title">Odhlášení (${odhlaseni.length})</h2>
+                ${odhlaseni.map(renderRow).join('')}
+            </div>` : ''}
+        `;
+    } catch (e) { /* tiché selhání */ }
 }
 
 function escapeHtml(text) {

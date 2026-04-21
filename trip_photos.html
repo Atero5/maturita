@@ -33,9 +33,10 @@
             <hr>
             <div id="uploadSection" style="display:none;">
                 <div class="upload-area" id="uploadArea">
-                    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/gif,image/webp" multiple style="display:none;">
+                    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">
                     <button class="btn-upload" onclick="document.getElementById('fileInput').click()">📷 Vybrat fotky</button>
-                    <span class="upload-hint">JPG, PNG, GIF, WEBP – max 10 MB / fotka</span>
+                    <span class="upload-hint">JPG, PNG, WEBP – max 10 MB / fotka</span>
+                    <span class="upload-drag-hint">nebo přetáhněte fotky sem</span>
                 </div>
                 <div id="uploadPreview" style="display:none;">
                     <div id="previewGrid" class="preview-grid"></div>
@@ -62,7 +63,9 @@
     <!-- Lightbox -->
     <div id="lightbox" class="lightbox" style="display:none;" onclick="closeLightbox(event)">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <button class="lightbox-arrow lightbox-prev" id="lightboxPrev" onclick="event.stopPropagation(); lightboxStep(-1)">&#8249;</button>
         <img id="lightboxImg" src="" alt="Fotka">
+        <button class="lightbox-arrow lightbox-next" id="lightboxNext" onclick="event.stopPropagation(); lightboxStep(1)">&#8250;</button>
         <p id="lightboxInfo" class="lightbox-info"></p>
     </div>
 

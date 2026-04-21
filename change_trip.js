@@ -76,6 +76,38 @@ async function loadTripData() {
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    // Validace povinných polí
+    const required = [
+        { name: 'nazev_vyletu', label: 'Název výletu' },
+        { name: 'adresa_ubytovani', label: 'Adresa ubytování' },
+        { name: 'delka_pobytu', label: 'Délka pobytu' },
+        { name: 'misto_odjezdu_tam', label: 'Místo odjezdu tam' },
+        { name: 'cas_odjezdu_tam', label: 'Čas odjezdu tam' },
+        { name: 'dopravni_prostredek_tam', label: 'Dopravní prostředek tam' },
+        { name: 'misto_odjezdu_zpet', label: 'Místo odjezdu zpět' },
+        { name: 'cas_odjezdu_zpet', label: 'Čas odjezdu zpět' },
+        { name: 'dopravni_prostredek_zpet', label: 'Dopravní prostředek zpět' },
+        { name: 'celkova_cena', label: 'Celková cena' },
+        { name: 'cislo_uctu', label: 'Číslo účtu' },
+    ];
+
+    for (const field of required) {
+        const el = document.querySelector(`[name="${field.name}"]`);
+        if (!el || !el.value.trim()) {
+            alert(`Vyplňte pole: ${field.label}`);
+            el && el.focus();
+            return;
+        }
+    }
+
+    const accountPattern = /^\d{2,10}\/\d{4}$/;
+    const accountVal = document.querySelector('input[name="cislo_uctu"]').value.trim();
+    if (!accountPattern.test(accountVal)) {
+        alert('Číslo účtu musí být ve formátu Čísloúčtu/Kódbanka (např. 123456/0100)');
+        document.querySelector('input[name="cislo_uctu"]').focus();
+        return;
+    }
+
     const checked = document.querySelectorAll('input[name="tridy[]"]:checked');
     if (checked.length === 0) {
         alert("Vyberte alespoň jednu třídu!");
@@ -103,6 +135,10 @@ document.querySelector('form').addEventListener('submit', function(e) {
         tridy: tridy
     };
 
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Ukládám...';
+
     fetch('api_trips.php', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -115,11 +151,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
             window.location.href = 'teacher.html';
         } else {
             alert(data.message || 'Chyba při úpravě výletu');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Potvrdit a upravit výlet';
         }
     })
     .catch(error => {
         console.error('Chyba:', error);
         alert('Chyba při úpravě výletu');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Potvrdit a upravit výlet';
     });
 });
 

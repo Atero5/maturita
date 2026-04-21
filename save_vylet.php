@@ -85,7 +85,7 @@ if ($stmt->execute()) {
     $tridy = $_POST['tridy'] ?? [];
 
     foreach ($tridy as $trida) {
-        $stmt2 = $conn->prepare("INSERT INTO vylety_tridy (vyletId, tridy) VALUES (?, ?)");
+        $stmt2 = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
         $stmt2->bind_param("is", $vylet_id, $trida);
         $stmt2->execute();
         $stmt2->close();
@@ -102,7 +102,7 @@ if ($stmt->execute()) {
             $cas = $data['cas'] ?? null;
             $vlastni_text = $data['vlastni_text'] ?? null;
 
-            $stmtS = $conn->prepare("INSERT INTO vylety_strava (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmtS = $conn->prepare("INSERT INTO " . $env['TRIPS_MEALS_TABLE'] . " (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmtS->bind_param("iisssssss", $vylet_id, $den, $typ_jidla, $typ, $nazev_rest, $adresa_rest, $kontakt_rest, $cas, $vlastni_text);
             $stmtS->execute();
             $stmtS->close();

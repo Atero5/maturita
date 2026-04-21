@@ -271,3 +271,42 @@ form iframe {
     color: #155724;
     cursor: default;
 }
+
+/* Focus styly */
+form input:not([type="radio"]):not([type="checkbox"]):focus,
+form select:focus,
+form textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+/* Textarea (harmonogram, strava) */
+.textarea-field {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    display: block;
+}
+
+/* Krok dokon\u010den (zaelen\u00fd \u010dek) */
+.step-tab.done {
+    color: #28a745;
+}
+
+.step-tab.done::after {
+    content: ' ✓';
+    font-weight: 700;
+}
+
+/* Submit tla\u010d\u00edtko disabled stav */
+form button[type="submit"]:disabled {
+    background-color: #94d497;
+    cursor: not-allowed;
+}

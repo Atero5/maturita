@@ -272,16 +272,7 @@ body {
     background-color: #f9f9f9;
     border-radius: 4px;
     padding: 5px;
-}
-
-.assigned-task {
-    background-color: #3498db;
-    color: white;
-    padding: 5px;
-    margin: 2px 0;
-    border-radius: 4px;
-    cursor: move;
-    font-size: 12px;
+    transition: background-color 0.15s ease;
 }
 
 .tasks-placeholder ul {
@@ -340,6 +331,82 @@ body {
     -webkit-user-drag: element;
 }
 
+/* Drag and drop visual feedback */
+.drag-over {
+    background-color: #dbeeff !important;
+    border-color: #3498db !important;
+    outline: 2px dashed #3498db;
+}
+
+.dragging {
+    opacity: 0.45;
+    cursor: grabbing !important;
+}
+
+.task-item {
+    cursor: grab;
+    background: #e8f4f8;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.task-item:hover {
+    background-color: #d1e7f0;
+    transform: translateX(2px);
+}
+
+.task-item-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-task-delete,
+.btn-task-unassign {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    color: #999;
+}
+
+.btn-task-delete:hover {
+    background-color: #fde8e8;
+    color: #e74c3c;
+}
+
+.btn-task-unassign {
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+}
+
+.btn-task-unassign:hover {
+    background-color: rgba(0,0,0,0.15);
+    color: white;
+}
+
+.drop-hint {
+    color: #999;
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+}
+
 [draggable="true"]:hover {
     opacity: 0.9;
 }
@@ -379,6 +446,10 @@ body {
     cursor: grab;
     font-size: 14px;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .assigned-task:hover {

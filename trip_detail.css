@@ -120,11 +120,111 @@ body {
     color: #333;
 }
 
+/* PDF tlačítka */
+.pdf-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0 18px;
+}
+
+.btn-pdf {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-pdf:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
 /* Třídy tagy */
 .class-tags {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+/* Odhlášení – student */
+.detail-section-odhlaseni {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.odhlaseni-status {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.odhlaseni-status--on { color: #28a745; }
+.odhlaseni-status--off { color: #e74c3c; }
+
+.btn-odhlasit {
+    padding: 8px 18px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.btn-odhlasit:hover { background: #c0392b; }
+
+.btn-prihlasit {
+    padding: 8px 18px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.btn-prihlasit:hover { background: #1e7e34; }
+
+/* Seznam účastníků – učitel */
+.ucastnik-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+.ucastnik-row:last-child { border-bottom: none; }
+
+.ucastnik-class {
+    background: #f0f0f0;
+    color: #555;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+}
+
+.ucastnik-email { color: #333; }
+
+.no-ucastnici {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    padding: 10px 0;
 }
 
 .class-tag {

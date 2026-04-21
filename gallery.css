@@ -89,6 +89,23 @@ h1 {
     gap: 10px;
 }
 
+.gallery-item-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.photo-count-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
+}
+
 .btn-gallery {
     padding: 8px 16px;
     border: none;

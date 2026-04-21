@@ -15,11 +15,12 @@ $email = $_POST['email'];
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
 $role = $_POST['role'];
+$parent_email = ($role !== 'teacher' && !empty($_POST['parent_email'])) ? $_POST['parent_email'] : null;
 
 $class = $role == "teacher" ? null : $_POST['class'];
 
 // Kontrola, zda jsou pole vyplněná
-if (empty($email) || empty($password) || empty($confirm_password) || empty($role) || ($role != "teacher" && empty($class))) {
+if (empty($email) || empty($password) || empty($confirm_password) || empty($role) || ($role != "teacher" && empty($class)) || ($role != "teacher" && empty($parent_email))) {
     die("Všechna pole musí být vyplněna.");
 }
 
@@ -32,8 +33,8 @@ if ($password !== $confirm_password) {
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Připravený dotaz - přidán sloupec class i role
-$stmt = $conn->prepare("INSERT INTO " . $env['USER_TABLE'] . " (email, password, class, role) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $email, $hashed_password, $class, $role);
+$stmt = $conn->prepare("INSERT INTO " . $env['USER_TABLE'] . " (email, password, class, role, parent_email) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $email, $hashed_password, $class, $role, $parent_email);
 
 // Pokus o uložení
 if ($stmt->execute()) {

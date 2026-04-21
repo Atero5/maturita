@@ -32,7 +32,10 @@
             
             <div class="field">
                 <h3>Heslo:</h3>
-                <input class="input" name = "password" type="password" placeholder="Zadejte heslo..." required>
+                <div class="password-wrapper">
+                    <input class="input" id="loginPassword" name="password" type="password" placeholder="Zadejte heslo..." required>
+                    <button type="button" class="btn-toggle-pw" onclick="togglePassword('loginPassword', this)" tabindex="-1">&#128065;</button>
+                </div>
             </div>
             <button class="btn_green" type = "submit">přihlásit se</button>
             </form>

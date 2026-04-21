@@ -85,14 +85,65 @@ function goToStep(step) {
     window.scrollTo(0, 0);
 }
 
-// Kliknutí na lištu kroků
+// Přechod na další krok s validací
+function validateAndGoToStep(from, to) {
+    if (from === 1) {
+        const nazev = document.querySelector('input[name="nazev_vyletu"]').value.trim();
+        const adresa = document.querySelector('input[name="adresa_ubytovani"]').value.trim();
+        const delka = document.getElementById('delkaPobytu').value;
+        const mistoTam = document.querySelector('input[name="misto_odjezdu_tam"]').value.trim();
+        const casTam = document.querySelector('input[name="cas_odjezdu_tam"]').value;
+        const dopravaTamVal = document.getElementById('dopravaTam').value;
+        const mistoZpet = document.querySelector('input[name="misto_odjezdu_zpet"]').value.trim();
+        const casZpet = document.querySelector('input[name="cas_odjezdu_zpet"]').value;
+        const dopravaZpetVal = document.getElementById('dopravaZpet').value;
+
+        if (!nazev || !adresa || !delka) {
+            alert('Vyplňte název výletu, adresu ubytování a délku pobytu.');
+            return;
+        }
+        if (delka === 'jine' && !document.querySelector('input[name="delka_pobytu_custom"]').value.trim()) {
+            alert('Zadejte vlastní délku pobytu.');
+            return;
+        }
+        if (!mistoTam || !casTam || !dopravaTamVal) {
+            alert('Vyplňte místo odjezdu tam, datum a dopravní prostředek.');
+            return;
+        }
+        if (dopravaTamVal === 'jine' && !document.querySelector('input[name="dopravni_prostredek_tam_custom"]').value.trim()) {
+            alert('Zadejte vlastní dopravní prostředek tam.');
+            return;
+        }
+        if (!mistoZpet || !casZpet || !dopravaZpetVal) {
+            alert('Vyplňte místo odjezdu zpět, datum a dopravní prostředek.');
+            return;
+        }
+        if (dopravaZpetVal === 'jine' && !document.querySelector('input[name="dopravni_prostredek_zpet_custom"]').value.trim()) {
+            alert('Zadejte vlastní dopravní prostředek zpět.');
+            return;
+        }
+        if (casTam && casZpet && casZpet <= casTam) {
+            alert('Datum a čas odjezdu zpět musí být po odjezdu tam.');
+            return;
+        }
+        document.querySelector('.step-tab[data-step="1"]').classList.add('done');
+    }
+    if (from === 2) {
+        document.querySelector('.step-tab[data-step="2"]').classList.add('done');
+    }
+    goToStep(to);
+}
+
+// Kliknutí na lištu kroků (pouze zpět nebo na done krok)
 document.querySelectorAll('.step-tab').forEach(tab => {
     tab.addEventListener('click', function() {
-        goToStep(this.dataset.step);
+        const target = parseInt(this.dataset.step);
+        const current = parseInt(document.querySelector('.step-tab.active').dataset.step);
+        if (target < current || this.classList.contains('done')) {
+            goToStep(target);
+        }
     });
 });
-
-// Zobrazení vlastního pole pro délku pobytu
 document.getElementById('delkaPobytu').addEventListener('change', function() {
     const customBox = document.getElementById('delkaPobytuCustom');
     const customInput = customBox.querySelector('input');
@@ -145,16 +196,16 @@ function generateMealFields() {
             const customId = `custom_${d}_${meal.key}`;
             html += `
                 <h4>${meal.label}</h4>
-                <label><input type="radio" name="${prefix}[typ]" value="restaurace" onchange="toggleMealBox('${boxId}','${customId}','restaurace')"> restaurace</label><br>
-                <label><input type="radio" name="${prefix}[typ]" value="vlastni" onchange="toggleMealBox('${boxId}','${customId}','vlastni')"> vlastní</label>
+                <label><input type="radio" name="${prefix}[typ]" value="vlastni" checked onchange="toggleMealBox('${boxId}','${customId}','vlastni')"> vlastní</label><br>
+                <label><input type="radio" name="${prefix}[typ]" value="restaurace" onchange="toggleMealBox('${boxId}','${customId}','restaurace')"> restaurace</label>
+                <div id="${customId}" class="">
+                    <textarea name="${prefix}[vlastni_text]" class="textarea-field" placeholder="Vlastní strava..." rows="2"></textarea>
+                </div>
                 <div id="${boxId}" class="hidden">
                     <input type="text" name="${prefix}[nazev_restaurace]" placeholder="Název restaurace...">
                     <input type="text" name="${prefix}[adresa_restaurace]" placeholder="Adresa restaurace...">
                     <input type="text" name="${prefix}[kontakt_restaurace]" placeholder="Kontakt na restauraci...">
                     <input type="text" name="${prefix}[cas]" placeholder="Čas...">
-                </div>
-                <div id="${customId}" class="hidden">
-                    <textarea name="${prefix}[vlastni_text]" placeholder="Vlastní strava..." style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;box-sizing:border-box;margin-bottom:15px;font-family:'Inter',Arial,sans-serif;resize:vertical;" rows="3"></textarea>
                 </div>
             `;
         });
@@ -285,6 +336,9 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 
     const formData = new FormData(this);
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Odesílám...';
 
     fetch('save_vylet.php', {
         method: 'POST',
@@ -297,11 +351,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
             window.location.href = 'teacher.html';
         } else {
             alert(data.message || 'Chyba při ukládání výletu');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Potvrdit a odeslat výlet';
         }
     })
     .catch(error => {
         console.error('Chyba:', error);
         alert('Chyba při ukládání výletu');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Potvrdit a odeslat výlet';
     });
 });
 
@@ -315,6 +373,16 @@ fetch('api_auth.php')
             loadTeachers(data.email);
             renderSelectedTeachers();
             document.body.style.visibility = 'visible';
+            // Nastavit minimální datum na dnešek
+            const nowStr = new Date().toISOString().slice(0, 16);
+            document.querySelector('input[name="cas_odjezdu_tam"]').min = nowStr;
+            document.querySelector('input[name="cas_odjezdu_zpet"]').min = nowStr;
+            // Aktualizovat min zpět při změně tam
+            document.querySelector('input[name="cas_odjezdu_tam"]').addEventListener('change', function() {
+                if (this.value) {
+                    document.querySelector('input[name="cas_odjezdu_zpet"]').min = this.value;
+                }
+            });
         } else {
             window.location.href = 'login.html';
         }

@@ -16,6 +16,51 @@ body{
     border-radius: 10px;
 }
 
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 220px;
+}
+
+.password-wrapper .input {
+    width: 100%;
+    padding-right: 38px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+/* Skrýt nativní oko prohlížeče (Edge, Chrome) */
+.password-wrapper .input::-ms-reveal,
+.password-wrapper .input::-ms-clear {
+    display: none;
+}
+.password-wrapper .input::-webkit-credentials-auto-fill-button,
+.password-wrapper .input::-webkit-textfield-decoration-container {
+    display: none !important;
+}
+
+.btn-toggle-pw {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-58%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.45;
+    transition: opacity 0.15s ease;
+    user-select: none;
+}
+
+.btn-toggle-pw:hover,
+.btn-toggle-pw.active {
+    opacity: 0.85;
+}
+
 hr {
     border: 0;
     border-top: 2px solid black;

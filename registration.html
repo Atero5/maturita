@@ -21,11 +21,17 @@
     </div>
     <div class="field">
         <h3>Heslo:</h3>
-        <input class="input" type="password" name="password" placeholder="Zadejte heslo..." required>
+        <div class="password-wrapper">
+            <input class="input" id="regPassword" type="password" name="password" placeholder="Zadejte heslo..." required>
+            <button type="button" class="btn-toggle-pw" onclick="togglePassword('regPassword', this)" tabindex="-1">&#128065;</button>
+        </div>
     </div>
     <div class="field">
         <h3>Potvrďte heslo:</h3>
-        <input class="input" type="password" name="confirm_password" placeholder="Zadejte heslo znovu..." required>
+        <div class="password-wrapper">
+            <input class="input" id="regPasswordConfirm" type="password" name="confirm_password" placeholder="Zadejte heslo znovu..." required>
+            <button type="button" class="btn-toggle-pw" onclick="togglePassword('regPasswordConfirm', this)" tabindex="-1">&#128065;</button>
+        </div>
     </div>
     <div class="field">
         <h3>Třída:</h3>
@@ -40,9 +46,9 @@
             <option value="teacher">Učitel</option>
         </select>
     </div>
-    <div class="field">
+    <div class="field" id="parentEmailField" style="display:none;">
         <h3>E-mail rodiče:</h3>
-        <input class="input" type="email" name="parent_email" placeholder="Zadejte e-mail rodiče...">
+        <input class="input" type="email" name="parent_email" id="parentEmail" placeholder="Zadejte e-mail rodiče...">
     </div>
     <input type="hidden" id="roleInput" name="role" value="">
     <button class="btn_green" type="submit">zaregistrovat se</button>

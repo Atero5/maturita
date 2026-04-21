@@ -18,13 +18,14 @@ fetch('api_auth.php')
 // Inicializace kalendáře
 function initializeCalendar() {
     const today = new Date();
-    let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    window.selectedDay = null; // Přidáno pro sledování vybraného dne
-    window.currentSelectedDate = null; // Pro sledování vybraného dne v day view
-    renderCalendar(currentDate);
+    window.currentCalendarDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    window.selectedDay = null;
+    window.currentSelectedDate = null;
+    window.allTasks = [];
+
     setupTaskHandlers();
-    loadAllTasks();
+    // Nejprve načíst úkoly, pak vykreslit kalendář
+    loadAllTasks().then(() => renderCalendar(window.currentCalendarDate));
 }
 
 // Obsluha tlačítka pro vytvoření úkolu
@@ -46,40 +47,16 @@ function setupTaskHandlers() {
             if (data.success) {
                 document.getElementById('taskName').value = '';
                 document.getElementById('taskEndTime').value = '';
-                // Přidat do localStorage
-                const allTasks = JSON.parse(localStorage.getItem('allTasks') || '[]');
-                allTasks.push({ id: data.task_id, task: taskName, end_time: endTime });
-                localStorage.setItem('allTasks', JSON.stringify(allTasks));
-                loadAllTasks();
+                loadAllTasks().then(() => renderCalendar(window.currentCalendarDate));
             } else {
                 alert('Chyba při ukládání úkolu.');
             }
         })
-        .catch(err => console.error('Chyba:', err));
+        .catch(() => alert('Chyba při ukládání úkolu.'));
     });
 }
 
-// Načtení a zobrazení všech úkolů učitele
-function loadAllTasks() {
-    fetch('api_tasks.php')
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById('tasksContainer');
-            if (data.success && data.tasks.length > 0) {
-                // Uložit do localStorage
-                localStorage.setItem('allTasks', JSON.stringify(data.tasks));
-                
-                container.innerHTML = data.tasks.map(t =>
-                    `<div draggable="true" ondragstart="dragTask(event)" data-task-id="${t.id}" style="cursor: grab; background: #e8f4f8; padding: 10px 12px; margin: 6px 0; border-radius: 6px; border-left: 4px solid #3498db;">`
-                    + `<strong>${t.task}</strong> – ${t.end_time}` + `</div>`
-                ).join('');
-            } else {
-                container.innerHTML = '<p>Žádné úkoly.</p>';
-                localStorage.setItem('allTasks', JSON.stringify([]));
-            }
-        })
-        .catch(err => console.error('Chyba:', err));
-}
+
 
 // Vykreslení kalendáře
 function renderCalendar(date) {
@@ -132,8 +109,10 @@ function renderCalendar(date) {
                 <div class="day-number">${day}</div>
                 ${taskCount > 0 ? `<div class="task-count">${taskCount}</div>` : ''}
                 <div class="day-details" style="display: none;">
-                    <div class="day-tasks" ondrop="dropTask(event)" ondragover="allowDrop(event)">
-                        ${dayTasks.map(task => `<div class="assigned-task" draggable="true" ondragstart="dragTask(event)" data-task-id="${task.taskId}">${task.task} - ${task.end_time}</div>`).join('')}
+                    <div class="day-tasks" ondrop="dropTask(event)" ondragover="allowDrop(event)"
+                         ondragenter="this.classList.add('drag-over')"
+                         ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('drag-over')">
+                        ${dayTasks.map(task => `<div class="assigned-task" draggable="true" ondragstart="dragTask(event)" data-task-id="${task.taskId}">${task.task} – ${task.end_time}</div>`).join('')}
                     </div>
                 </div>
             </div>
@@ -172,6 +151,7 @@ function renderCalendar(date) {
             const calendarHeader = document.querySelector('.calendar-header');
             const calendarWeekdays = document.querySelector('.calendar-weekdays');
             const calendarGrid = document.querySelector('.calendar-grid');
+            window.currentSelectedDate = null;
             dayView.style.display = 'none';
             calendarHeader.style.display = 'flex';
             calendarWeekdays.style.display = 'flex';
@@ -182,6 +162,12 @@ function renderCalendar(date) {
         const dayViewTasks = document.getElementById('dayViewTasks');
         dayViewTasks.addEventListener('dragover', allowDrop);
         dayViewTasks.addEventListener('drop', dropTaskToDay);
+        dayViewTasks.addEventListener('dragenter', () => dayViewTasks.classList.add('drag-over'));
+        dayViewTasks.addEventListener('dragleave', (e) => {
+            if (!dayViewTasks.contains(e.relatedTarget)) {
+                dayViewTasks.classList.remove('drag-over');
+            }
+        });
     }
     
     // Skrýt dayView pokud je zobrazen
@@ -207,16 +193,15 @@ function nextMonth() {
 }
 
 // Funkce pro rozbalení/sbalení dne
-function toggleDay(dayElement) {
+function toggleDay(dayElement, forceDateKey) {
     const calendarWidget = document.getElementById('calendarWidget');
     const calendarHeader = calendarWidget.querySelector('.calendar-header');
     const calendarWeekdays = calendarWidget.querySelector('.calendar-weekdays');
     const calendarGrid = calendarWidget.querySelector('.calendar-grid');
     const dayView = document.getElementById('dayView');
-    const dateKey = dayElement.dataset.date;
-    
-    console.log('Toggling day:', dateKey);
-    
+    const dateKey = forceDateKey || (dayElement && dayElement.dataset.date);
+    if (!dateKey) return;
+
     // Uložit vybraný den
     window.currentSelectedDate = dateKey;
     
@@ -231,7 +216,6 @@ function toggleDay(dayElement) {
     // Naplnit údaje
     const date = new Date(dateKey);
     const dayTasks = getDayTasks(dateKey);
-    console.log('Day tasks:', dayTasks);
     
     document.getElementById('dayViewDate').textContent = date.toLocaleDateString('cs-CZ', { 
         year: 'numeric', 
@@ -240,9 +224,14 @@ function toggleDay(dayElement) {
     });
     const tasksContainer = document.getElementById('dayViewTasks');
     if (dayTasks.length > 0) {
-        tasksContainer.innerHTML = dayTasks.map(task => `<div class="assigned-task" draggable="true" ondragstart="dragTask(event)" data-task-id="${task.taskId}" style="cursor: grab; background: white; padding: 10px; margin: 5px 0; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #333;">${task.task} - ${task.end_time}</div>`).join('');
+        tasksContainer.innerHTML = dayTasks.map(task =>
+            `<div class="assigned-task" draggable="true" ondragstart="dragTask(event)" data-task-id="${task.taskId}">`
+            + `<span class="task-item-text">${task.task} – ${task.end_time}</span>`
+            + `<button class="btn-task-unassign" onclick="unassignTask(${task.taskId})" title="Odebrat z dne">↩</button>`
+            + `</div>`
+        ).join('');
     } else {
-        tasksContainer.innerHTML = '<p style="color: #999; text-align: center;">Přetáhněte sem úkol nebo <br>nejsou pro tento den žádné úkoly.</p>';
+        tasksContainer.innerHTML = '<p class="drop-hint">Přetáhněte sem úkol z panelu úkolů.</p>';
     }
 }
 
@@ -253,116 +242,129 @@ function allowDrop(ev) {
 
 function dragTask(ev) {
     let element = ev.target;
-    // Proklikej až k elementu s data-task-id
     while (element && !element.getAttribute('data-task-id')) {
         element = element.parentElement;
     }
     if (element) {
-        const taskId = element.getAttribute('data-task-id');
         ev.dataTransfer.effectAllowed = 'move';
-        ev.dataTransfer.setData("text", taskId);
-        console.log('Dragging task ID:', taskId, 'Element:', element);
-    } else {
-        console.log('No element with data-task-id found');
+        ev.dataTransfer.setData('text', element.getAttribute('data-task-id'));
+        element.classList.add('dragging');
+        document.addEventListener('dragend', () => element.classList.remove('dragging'), { once: true });
     }
 }
 
 function dropTask(ev) {
     ev.preventDefault();
-    const taskId = ev.dataTransfer.getData("text");
+    ev.currentTarget.classList.remove('drag-over');
+    const taskId = ev.dataTransfer.getData('text');
     const dayElement = ev.target.closest('.calendar-day');
+    if (!dayElement) return;
     const dateKey = dayElement.dataset.date;
-    
-    // Najít úkol podle ID
-    const allTasks = JSON.parse(localStorage.getItem('allTasks') || '[]');
-    const taskIndex = allTasks.findIndex(t => t.taskId == taskId);
-    if (taskIndex !== -1) {
-        const task = allTasks.splice(taskIndex, 1)[0];
-        assignTaskToDay(task, dateKey);
-        localStorage.setItem('allTasks', JSON.stringify(allTasks));
-        loadAllTasks();
-        renderCalendar(window.currentCalendarDate);
-    }
+    assignTaskToDay(parseInt(taskId), dateKey);
 }
 
 function dropTaskToDay(ev) {
     ev.preventDefault();
-    const taskId = ev.dataTransfer.getData("text");
+    ev.currentTarget.classList.remove('drag-over');
+    const taskId = ev.dataTransfer.getData('text');
     const dateKey = window.currentSelectedDate;
-    
-    console.log('Dropping task ID:', taskId, 'to date:', dateKey);
-    
-    if (!dateKey || !taskId) {
-        console.log('Invalid dateKey or taskId');
-        return;
-    }
-    
-    // Najít úkol podle ID
-    const allTasks = JSON.parse(localStorage.getItem('allTasks') || '[]');
-    console.log('All tasks:', allTasks);
-    
-    const task = allTasks.find(t => t.taskId == taskId);
-    
-    if (task) {
-        console.log('Found task:', task);
-        assignTaskToDay(task, dateKey);
-        // Aktualizovat dayViewTasks
-        const dayTasks = getDayTasks(dateKey);
-        console.log('Day tasks after assignment:', dayTasks);
-        
-        const tasksContainer = document.getElementById('dayViewTasks');
-        if (dayTasks.length > 0) {
-            tasksContainer.innerHTML = dayTasks.map(task => `<div class="assigned-task" draggable="true" ondragstart="dragTask(event)" data-task-id="${task.taskId}" style="cursor: grab; background: white; padding: 10px; margin: 5px 0; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #333;">${task.task} - ${task.end_time}</div>`).join('');
-        } else {
-            tasksContainer.innerHTML = '<p style="color: #999; text-align: center;">Přetáhněte sem úkol nebo <br>nejsou pro tento den žádné úkoly.</p>';
-        }
-        loadAllTasks();
-    } else {
-        console.log('Task not found!');
-    }
+    if (!dateKey || !taskId) return;
+    assignTaskToDay(parseInt(taskId), dateKey);
 }
 
 // Pomocné funkce pro správu úkolů
 function getDayTasks(dateKey) {
-    const dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '{}');
-    console.log('getDayTasks for', dateKey, ':', dayTasks[dateKey] || []);
-    return dayTasks[dateKey] || [];
+    return (window.allTasks || []).filter(t => t.date === dateKey);
 }
 
-function assignTaskToDay(task, dateKey) {
-    const dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '{}');
-    if (!dayTasks[dateKey]) dayTasks[dateKey] = [];
-    // Zkontrolovat, zda už není přiřazen
-    if (!dayTasks[dateKey].find(t => t.taskId == task.taskId)) {
-        dayTasks[dateKey].push(task);
-        localStorage.setItem('dayTasks', JSON.stringify(dayTasks));
-        console.log('Assigned task', task.taskId, 'to', dateKey, '- updated dayTasks:', dayTasks);
+function assignTaskToDay(taskId, dateKey) {
+    const dayView = document.getElementById('dayView');
+    const dayViewWasOpen = dayView && dayView.style.display !== 'none';
+
+    fetch('api_tasks.php', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: taskId, date: dateKey })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadAllTasks().then(() => {
+                renderCalendar(window.currentCalendarDate);
+                if (dayViewWasOpen && window.currentSelectedDate) {
+                    toggleDay(null, window.currentSelectedDate);
+                }
+            });
+        }
+    })
+    .catch(() => alert('Chyba při přiřazení úkolu.'));
+}
+
+// Načtení a zobrazení úkolů
+function loadAllTasks() {
+    return fetch('api_tasks.php')
+        .then(res => res.json())
+        .then(data => {
+            window.allTasks = (data.success && data.tasks) ? data.tasks : [];
+            renderTaskPanel();
+        })
+        .catch(() => {
+            window.allTasks = [];
+            renderTaskPanel();
+        });
+}
+
+function renderTaskPanel() {
+    const container = document.getElementById('tasksContainer');
+    const unassigned = (window.allTasks || []).filter(t => !t.date || t.date === '0000-00-00');
+    if (unassigned.length > 0) {
+        container.innerHTML = unassigned.map(t =>
+            `<div draggable="true" ondragstart="dragTask(event)" data-task-id="${t.taskId}" class="task-item">`
+            + `<span class="task-item-text"><strong>${t.task}</strong> – ${t.end_time}</span>`
+            + `<button class="btn-task-delete" onclick="deleteTask(${t.taskId})" title="Smazat úkol">&times;</button>`
+            + `</div>`
+        ).join('');
     } else {
-        console.log('Task', task.taskId, 'already assigned to', dateKey);
+        container.innerHTML = '<p>Žádné nepřiřazené úkoly.</p>';
     }
 }
 
-// Aktualizace loadAllTasks pro draggable
-function loadAllTasks() {
-    fetch('api_tasks.php')
-        .then(res => res.json())
-        .then(data => {
-            console.log('API response:', data);
-            console.log('Tasks data:', data.tasks);
-            const container = document.getElementById('tasksContainer');
-            if (data.success && data.tasks.length > 0) {
-                // Uložit do localStorage
-                localStorage.setItem('allTasks', JSON.stringify(data.tasks));
-                
-                container.innerHTML = data.tasks.map(t => {
-                    console.log('Task object:', t);
-                    return `<div draggable="true" ondragstart="dragTask(event)" data-task-id="${t.taskId}" style="cursor: grab; background: #e8f4f8; padding: 10px 12px; margin: 6px 0; border-radius: 6px; border-left: 4px solid #3498db;">`
-                        + `<strong>${t.task}</strong> – ${t.end_time}` + `</div>`;
-                }).join('');
-            } else {
-                container.innerHTML = '<p>Žádné úkoly.</p>';
-                localStorage.setItem('allTasks', JSON.stringify([]));
-            }
-        })
-        .catch(err => console.error('Chyba:', err));
+function deleteTask(taskId) {
+    if (!confirm('Opravdu chcete smazat tento úkol?')) return;
+    fetch('api_tasks.php', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: taskId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadAllTasks().then(() => renderCalendar(window.currentCalendarDate));
+        } else {
+            alert('Chyba při mazání úkolu.');
+        }
+    })
+    .catch(() => alert('Chyba při mazání úkolu.'));
+}
+
+function unassignTask(taskId) {
+    fetch('api_tasks.php', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: taskId, date: null })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadAllTasks().then(() => {
+                renderCalendar(window.currentCalendarDate);
+                if (window.currentSelectedDate) {
+                    toggleDay(null, window.currentSelectedDate);
+                }
+            });
+        } else {
+            alert('Chyba při odebírání úkolu.');
+        }
+    })
+    .catch(() => alert('Chyba při odebírání úkolu.'));
 }

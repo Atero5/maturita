@@ -79,9 +79,12 @@ function renderTrips(trips) {
                     <span class="gallery-item-name">${escapeHtml(trip.nazev || trip.nazev_vyletu || '')}</span>
                     <span class="gallery-item-date">Návrat: ${dateStr}</span>
                 </div>
-                <div class="gallery-item-buttons">
-                    <button class="btn-gallery btn-add-photo" onclick="goUpload(${trip.id || trip.vyletId})">Přidat fotku</button>
-                    <button class="btn-gallery btn-view-photos" onclick="goPhotos(${trip.id || trip.vyletId})">Zobrazit fotky</button>
+                <div class="gallery-item-right">
+                    ${trip.photo_count > 0 ? `<span class="photo-count-badge">${trip.photo_count} ${trip.photo_count === 1 ? 'fotka' : trip.photo_count < 5 ? 'fotky' : 'fotek'}</span>` : ''}
+                    <div class="gallery-item-buttons">
+                        <button class="btn-gallery btn-add-photo" onclick="goUpload(${trip.id || trip.vyletId})">Přidat fotku</button>
+                        <button class="btn-gallery btn-view-photos" onclick="goPhotos(${trip.id || trip.vyletId})">Zobrazit fotky</button>
+                    </div>
                 </div>
             </div>
         `;

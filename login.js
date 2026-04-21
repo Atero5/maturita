@@ -1,4 +1,11 @@
 
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.classList.toggle('active', show);
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('registered') === 'true') {
     const successMessage = document.getElementById('successMessage');
