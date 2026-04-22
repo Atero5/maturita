@@ -1,0 +1,22 @@
+# Vendor libraries (should be installed via composer/npm)
+/tcpdf/
+/phpmailer/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.log
+cookies.txt
+
+# Uploads (if large)
+# /uploads/
+
+# Local environment
+.env.local
