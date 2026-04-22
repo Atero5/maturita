@@ -6,6 +6,22 @@ if (!tripId) {
     window.history.back();
 }
 
+// Funkce pro stažení PDF
+async function downloadPDF(type, id) {
+    try {
+        // Vytvořit dočasný link element a kliknout na něj
+        const link = document.createElement('a');
+        link.href = `generate_pdf.php?type=${type}&id=${id}`;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('Chyba při stahování');
+    }
+}
+
 let userRole = '';
 
 async function init() {
@@ -145,11 +161,13 @@ function renderDetail(trip) {
 
     container.innerHTML = `
         <h1 class="trip-title">${escapeHtml(trip.nazev_vyletu || 'Bez názvu')}</h1>
-        ${(userRole === 'teacher' || userRole === 'admin') ? `
         <div class="pdf-actions">
-            <a class="btn-pdf" href="print_harmonogram.php?id=${trip.id}" target="_blank">📄 Harmonogram (PDF)</a>
-            <a class="btn-pdf" href="print_seznam.php?id=${trip.id}" target="_blank">👥 Seznam žáků (PDF)</a>
-        </div>` : ''}
+            <button class="btn-pdf" type="button" onclick="downloadPDF('harmonogram', ${trip.id})">📄 Harmonogram (PDF)</button>
+            ${(userRole === 'teacher' || userRole === 'admin') ? `
+                <button class="btn-pdf" type="button" onclick="downloadPDF('seznam', ${trip.id})">👥 Seznam žáků (PDF)</button>
+                <button class="btn-pdf" type="button" onclick="downloadPDF('cestovni', ${trip.id})">📋 Cestovní příkaz (PDF)</button>
+            ` : ''}
+        </div>
         <hr>
         <!-- Základní info -->
         <div class="detail-section">

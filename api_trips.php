@@ -165,6 +165,36 @@ if ($method === 'PUT') {
             $ins->close();
         }
 
+        // Aktualizace stravy
+        $delStrava = $conn->prepare("DELETE FROM " . $env['TRIPS_MEALS_TABLE'] . " WHERE vyletId = ?");
+        $delStrava->bind_param("i", $id);
+        $delStrava->execute();
+        $delStrava->close();
+
+        $strava = $input['strava'] ?? [];
+        $insStrava = $conn->prepare("INSERT INTO " . $env['TRIPS_MEALS_TABLE'] . " 
+            (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        foreach ($strava as $den => $meals) {
+            foreach ($meals as $typ_jidla => $meal) {
+                $typ = $meal['typ'] ?? 'vlastni';
+                $nazev_rest = $meal['nazev_restaurace'] ?? null;
+                $adresa_rest = $meal['adresa_restaurace'] ?? null;
+                $kontakt_rest = $meal['kontakt_restaurace'] ?? null;
+                $cas = $meal['cas'] ?? null;
+                $vlastni_text = $meal['vlastni_text'] ?? null;
+                
+                $insStrava->bind_param(
+                    "iisssssss",
+                    $id, $den, $typ_jidla, $typ,
+                    $nazev_rest, $adresa_rest, $kontakt_rest, $cas, $vlastni_text
+                );
+                $insStrava->execute();
+            }
+        }
+        $insStrava->close();
+
         echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně upraven']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Chyba při úpravě výletu']);

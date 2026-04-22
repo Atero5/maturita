@@ -5,25 +5,29 @@ function togglePassword(inputId, btn) {
     btn.classList.toggle('active', show);
 }
 
-function updateRole() {
-    const classSelect = document.getElementById('classSelect');
-    const roleInput = document.getElementById('roleInput');
+function updateRoleFields() {
+    const role = document.querySelector('input[name="role"]:checked')?.value;
+    const classField = document.getElementById('classField');
     const parentEmailField = document.getElementById('parentEmailField');
-    const parentEmailInput = document.getElementById('parentEmail');
+    const classInput = document.getElementById('classInput');
+    const parentEmail = document.getElementById('parentEmail');
 
-    if (classSelect.value === 'teacher') {
-        roleInput.value = 'teacher';
-        parentEmailField.style.display = 'none';
-        parentEmailInput.required = false;
-        parentEmailInput.value = '';
-    } else if (classSelect.value !== '') {
-        roleInput.value = 'student';
+    if (role === 'student') {
+        classField.style.display = 'flex';
         parentEmailField.style.display = 'flex';
-        parentEmailInput.required = true;
-    } else {
-        roleInput.value = '';
+        classInput.required = true;
+        parentEmail.required = true;
+    } else if (role === 'teacher') {
+        classField.style.display = 'none';
         parentEmailField.style.display = 'none';
-        parentEmailInput.required = false;
-        parentEmailInput.value = '';
+        classInput.required = false;
+        parentEmail.required = false;
+        classInput.value = '';
+        parentEmail.value = '';
+    } else {
+        classField.style.display = 'none';
+        parentEmailField.style.display = 'none';
+        classInput.required = false;
+        parentEmail.required = false;
     }
 }

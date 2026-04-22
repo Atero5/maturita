@@ -56,13 +56,34 @@
         </iframe>
 
         <h3>Délka pobytu</h3>
-        <input type="text" name="delka_pobytu" placeholder="Zadejte délku..." required>
+        <select class="input" name="delka_pobytu" id="delkaPobytu" required>
+            <option value="">-- Vyberte --</option>
+            <option value="1 den">1 den</option>
+            <option value="2 dny">2 dny</option>
+            <option value="3 dny">3 dny</option>
+            <option value="4 dny">4 dny</option>
+            <option value="5 dní">5 dní</option>
+            <option value="jine">Jiné</option>
+        </select>
+        <div id="delkaPobytuCustom" class="hidden">
+            <input type="text" name="delka_pobytu_custom" placeholder="Zadejte vlastní délku...">
+        </div>
 
         <h3>Harmonogram</h3>
         <textarea name="harmonogram" class="textarea-field" placeholder="Zadejte harmonogram výletu..." rows="6"></textarea>
 
         <h3>Učitelé na výletě</h3>
-        <input type="text" name="uciitele" placeholder="E-maily učitelů oddělené čárkou...">
+        <div class="teacher-select-wrapper">
+            <div class="teacher-selected" id="selectedTeachers"></div>
+            <select id="teacherDropdown" class="input">
+                <option value="">-- Vyberte učitele --</option>
+            </select>
+            <input type="hidden" name="uciitele" id="uciteleHidden">
+        </div>
+
+        <h2>Stravování</h2>
+        <p id="stravaInfo" style="text-align:center; color:#888;">Strava se vygeneruje podle délky pobytu.</p>
+        <div id="stravaContainer"></div>
 
         <h2>Doprava tam</h2>
         <h3>Místo odjezdu</h3>
@@ -70,7 +91,15 @@
         <h3>Čas odjezdu</h3>
         <input type="datetime-local" name="cas_odjezdu_tam" required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_tam" placeholder="Zadejte prostředek..." required>
+        <select class="input" name="dopravni_prostredek_tam" id="dopravaTam" required>
+            <option value="">-- Vyberte --</option>
+            <option value="autobus">Autobus</option>
+            <option value="vlak">Vlak</option>
+            <option value="jine">Jiné</option>
+        </select>
+        <div id="dopravaTamCustom" class="hidden">
+            <input type="text" name="dopravni_prostredek_tam_custom" placeholder="Zadejte dopravní prostředek...">
+        </div>
 
         <h2>Doprava zpět</h2>
         <h3>Místo odjezdu</h3>
@@ -78,7 +107,15 @@
         <h3>Čas odjezdu</h3>
         <input type="datetime-local" name="cas_odjezdu_zpet" required>
         <h3>Dopravní prostředek</h3>
-        <input type="text" name="dopravni_prostredek_zpet" placeholder="Zadejte prostředek..." required>
+        <select class="input" name="dopravni_prostredek_zpet" id="dopravaZpet" required>
+            <option value="">-- Vyberte --</option>
+            <option value="autobus">Autobus</option>
+            <option value="vlak">Vlak</option>
+            <option value="jine">Jiné</option>
+        </select>
+        <div id="dopravaZpetCustom" class="hidden">
+            <input type="text" name="dopravni_prostredek_zpet_custom" placeholder="Zadejte dopravní prostředek...">
+        </div>
 
         <h2>Cena</h2>
         <h3>Celková cena</h3>
@@ -87,13 +124,8 @@
         <input type="text" name="cislo_uctu" placeholder="Např. 123456789/0100" pattern="^\d{2,10}\/\d{4}$" title="Formát: Čísloúčtu/Kódbanka (např. 123456/0100)" required>
 
         <h3>Třídy na výlet</h3>
-        <div class="classes-grid">
-            <label><input type="checkbox" name="tridy[]" value="V4A"> V4A</label>
-            <label><input type="checkbox" name="tridy[]" value="V4B"> V4B</label>
-            <label><input type="checkbox" name="tridy[]" value="V4C"> V4C</label>
-            <label><input type="checkbox" name="tridy[]" value="S4A"> S4A</label>
-            <label><input type="checkbox" name="tridy[]" value="S4B"> S4B</label>
-            <label><input type="checkbox" name="tridy[]" value="S4C"> S4C</label>
+        <div class="classes-grid" id="classesGrid">
+            <!-- Třídy se načtou dynamicky z databáze -->
         </div>
 
         <br><br>

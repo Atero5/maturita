@@ -52,11 +52,34 @@ function renderSelectedTeachers() {
     document.getElementById('uciteleHidden').value = selectedTeachersList.join(', ');
 }
 
+function loadClasses() {
+    return fetch('api_classes.php')
+        .then(res => res.json())
+        .then(classes => {
+            const grid = document.getElementById('classesGrid');
+            if (classes && classes.length > 0) {
+                let html = '';
+                classes.forEach(cls => {
+                    html += `<label><input type="checkbox" name="tridy[]" value="${cls}"> ${cls}</label>`;
+                });
+                grid.innerHTML = html;
+            } else {
+                grid.innerHTML = '<p style="color: #999;">Žádné třídy v databázi</p>';
+            }
+        })
+        .catch(err => {
+            console.error('Chyba při načítání tříd:', err);
+            grid.innerHTML = '<p style="color: red;">Chyba při načítání tříd</p>';
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('teacherDropdown').addEventListener('change', function() {
         addTeacher(this.value);
         this.value = '';
     });
+    
+    loadClasses();
 });
 
 // Původní funkce pro mapu

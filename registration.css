@@ -51,3 +51,25 @@ select.input {
     border-radius: 10px;
     border: 1px solid #ccc;
 }
+
+.role-options {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.role-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.role-options input[type="radio"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}

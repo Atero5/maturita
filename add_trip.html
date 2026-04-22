@@ -145,13 +145,8 @@
             <input type="text" name="cislo_uctu" placeholder="Např. 123456789/0100" pattern="^\d{2,10}\/\d{4}$" title="Formát: Čísloúčtu/Kódbanka (např. 123456/0100)" required>
 
             <h3>Třídy na výlet</h3>
-            <div class="classes-grid">
-                <label><input type="checkbox" name="tridy[]" value="V4A"> V4A</label>
-                <label><input type="checkbox" name="tridy[]" value="V4B"> V4B</label>
-                <label><input type="checkbox" name="tridy[]" value="V4C"> V4C</label>
-                <label><input type="checkbox" name="tridy[]" value="S4A"> S4A</label>
-                <label><input type="checkbox" name="tridy[]" value="S4B"> S4B</label>
-                <label><input type="checkbox" name="tridy[]" value="S4C"> S4C</label>
+            <div class="classes-grid" id="classesGrid">
+                <!-- Třídy se načtou dynamicky z databáze -->
             </div>
 
             <br><br>

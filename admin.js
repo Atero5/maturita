@@ -30,7 +30,7 @@
                             <a href="change_role.php?id=${user.userId}&role=student">Student</a> |
                             <a href="change_role.php?id=${user.userId}&role=teacher">Teacher</a> |
                             <a href="change_role.php?id=${user.userId}&role=admin">Admin</a> |
-                            <a href="delete_user.php?id=${user.userId}" 
+                            <a href="delete_user.php?id=${user.userId}"
                                class="btn-delete"
                                onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">
                                Smazat

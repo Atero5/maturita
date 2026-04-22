@@ -14,14 +14,17 @@ if ($conn->connect_error) {
 $email = $_POST['email'];
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
-$role = $_POST['role'];
-$parent_email = ($role !== 'teacher' && !empty($_POST['parent_email'])) ? $_POST['parent_email'] : null;
-
-$class = $role == "teacher" ? null : $_POST['class'];
+$role = $_POST['role'] ?? '';
+$class = ($role === 'student' && !empty($_POST['class'])) ? $_POST['class'] : null;
+$parent_email = ($role === 'student' && !empty($_POST['parent_email'])) ? $_POST['parent_email'] : null;
 
 // Kontrola, zda jsou pole vyplněná
-if (empty($email) || empty($password) || empty($confirm_password) || empty($role) || ($role != "teacher" && empty($class)) || ($role != "teacher" && empty($parent_email))) {
-    die("Všechna pole musí být vyplněna.");
+if (empty($email) || empty($password) || empty($confirm_password) || empty($role)) {
+    die("Všechna povinná pole musí být vyplněna.");
+}
+
+if ($role === 'student' && (empty($class) || empty($parent_email))) {
+    die("Studenti musí zadat třídu a e-mail rodiče.");
 }
 
 // Kontrola shody hesel
