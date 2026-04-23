@@ -204,6 +204,43 @@ if (teacherDropdown) {
     });
 }
 
+// Listener na náhledový obrázek
+const nahledovyObrazekInput = document.getElementById('nahledovyObrazek');
+if (nahledovyObrazekInput) {
+    nahledovyObrazekInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('obrazekPreview');
+        const img = document.getElementById('previewImg');
+        
+        if (file) {
+            // Kontrola typu souboru
+            if (!file.type.startsWith('image/')) {
+                alert('Vyberte prosím obrázek.');
+                this.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            // Kontrola velikosti (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Obrázek je příliš velký. Maximální velikost je 5MB.');
+                this.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
+}
+
 // Funkce pro sbírání stravy z formuláře
 function collectMealData() {
     const strava = {};
@@ -279,10 +316,21 @@ async function loadTripData() {
         }
 
         const trip = data.trip;
+        
+        // Nastavit ID výletu do hidden fieldu
+        document.getElementById('vyletId').value = trip.id;
 
         // Základní informace
         document.querySelector('input[name="nazev_vyletu"]').value = trip.nazev_vyletu || '';
         document.querySelector('input[name="adresa_ubytovani"]').value = trip.adresa_ubytovani || '';
+        
+        // Náhledový obrázek - zobrazit existující obrázek
+        if (trip.nahledovy_obrazek) {
+            const currentImgDiv = document.getElementById('obrazekCurrent');
+            const currentImg = document.getElementById('currentImg');
+            currentImg.src = trip.nahledovy_obrazek;
+            currentImgDiv.style.display = 'block';
+        }
         
         // Délka pobytu - nastavit select
         const delkaSelect = document.getElementById('delkaPobytu');
@@ -388,10 +436,10 @@ async function loadTripData() {
     }
 }
 
-// Odeslání upraveného výletu
+// Odeslání upraveného výletu - validace a fetch s FormData
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
-
+    
     // Validace povinných polí
     const required = [
         { name: 'nazev_vyletu', label: 'Název výletu' },
@@ -430,59 +478,16 @@ document.querySelector('form').addEventListener('submit', function(e) {
         return;
     }
 
-    const tridy = [];
-    checked.forEach(cb => tridy.push(cb.value));
-
-    const strava = collectMealData();
-
-    // Sbírání dopravního prostředku tam
-    const dopravaTamSelect = document.getElementById('dopravaTam').value;
-    let dopravaTamValue = dopravaTamSelect;
-    if (dopravaTamSelect === 'jine') {
-        dopravaTamValue = document.querySelector('input[name="dopravni_prostredek_tam_custom"]').value;
-    }
-
-    // Sbírání dopravního prostředku zpět
-    const dopravaZpetSelect = document.getElementById('dopravaZpet').value;
-    let dopravaZpetValue = dopravaZpetSelect;
-    if (dopravaZpetSelect === 'jine') {
-        dopravaZpetValue = document.querySelector('input[name="dopravni_prostredek_zpet_custom"]').value;
-    }
-
-    // Sbírání délky pobytu
-    const delkaSelect = document.getElementById('delkaPobytu').value;
-    let delkaValue = delkaSelect;
-    if (delkaSelect === 'jine') {
-        delkaValue = document.querySelector('input[name="delka_pobytu_custom"]').value;
-    }
-
-    const body = {
-        id: parseInt(tripId),
-        nazev_vyletu: document.querySelector('input[name="nazev_vyletu"]').value,
-        adresa_ubytovani: document.querySelector('input[name="adresa_ubytovani"]').value,
-        delka_pobytu: delkaValue,
-        harmonogram: document.querySelector('textarea[name="harmonogram"]').value,
-        uciitele: document.getElementById('uciteleHidden').value,
-        misto_odjezdu_tam: document.querySelector('input[name="misto_odjezdu_tam"]').value,
-        cas_odjezdu_tam: document.querySelector('input[name="cas_odjezdu_tam"]').value,
-        dopravni_prostredek_tam: dopravaTamValue,
-        misto_odjezdu_zpet: document.querySelector('input[name="misto_odjezdu_zpet"]').value,
-        cas_odjezdu_zpet: document.querySelector('input[name="cas_odjezdu_zpet"]').value,
-        dopravni_prostredek_zpet: dopravaZpetValue,
-        celkova_cena: document.querySelector('input[name="celkova_cena"]').value,
-        cislo_uctu: document.querySelector('input[name="cislo_uctu"]').value,
-        tridy: tridy,
-        strava: strava
-    };
-
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Ukládám...';
 
-    fetch('api_trips.php', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+    // Vytvoření FormData z formuláře
+    const formData = new FormData(this);
+
+    fetch('update_trip.php', {
+        method: 'POST',
+        body: formData
     })
     .then(res => res.json())
     .then(data => {

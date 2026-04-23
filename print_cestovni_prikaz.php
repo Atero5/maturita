@@ -29,8 +29,10 @@ if ($role === 'admin') {
     $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
     $stmt->bind_param("i", $id);
 } else {
-    $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+    // Učitel vidí výlet pokud ho vytvořil NEBO je uveden v uciitele
+    $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    $teacher_email = $_SESSION['email'] ?? '';
+    $stmt->bind_param("iss", $id, $_SESSION['user_id'], $teacher_email);
 }
 $stmt->execute();
 $trip = $stmt->get_result()->fetch_assoc();

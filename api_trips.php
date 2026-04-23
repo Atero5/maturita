@@ -31,13 +31,30 @@ if ($method === 'GET' && isset($_GET['id'])) {
     // Učitel/admin vidí vlastní výlety, student vidí výlety přiřazené jeho třídě
     if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId INNER JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database error: ' . $conn->error]);
+            exit();
+        }
         $stmt->bind_param("is", $id, $_SESSION['class']);
     } elseif ($_SESSION['role'] === 'admin') {
         $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId WHERE v.vyletId = ?");
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database error: ' . $conn->error]);
+            exit();
+        }
         $stmt->bind_param("i", $id);
     } else {
-        $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId WHERE v.vyletId = ? AND v.userId = ?");
-        $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+        // Učitel: vidí výlety co sám vytvořil NEBO na kterých se podílí
+        $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId WHERE v.vyletId = ? AND (v.userId = ? OR CONCAT(', ', v.uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database error: ' . $conn->error]);
+            exit();
+        }
+        $teacher_email = $_SESSION['email'] ?? '';
+        $stmt->bind_param("iss", $id, $_SESSION['user_id'], $teacher_email);
     }
     $stmt->execute();
     $result = $stmt->get_result();
@@ -108,9 +125,10 @@ if ($method === 'PUT') {
         exit();
     }
 
-    // Ověření vlastnictví
-    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $check->bind_param("ii", $id, $_SESSION['user_id']);
+    // Ověření vlastnictví - učitel může upravit výlet pokud ho vytvořil NEBO se na něm podílí
+    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    $teacher_email = $_SESSION['email'] ?? '';
+    $check->bind_param("iss", $id, $_SESSION['user_id'], $teacher_email);
     $check->execute();
     if ($check->get_result()->num_rows === 0) {
         http_response_code(403);
@@ -141,66 +159,76 @@ if ($method === 'PUT') {
         misto_odjezdu_zpet = ?, cas_odjezdu_zpet = ?, dopravni_prostredek_zpet = ?,
         harmonogram = ?, uciitele = ?,
         celkova_cena = ?, cislo_uctu = ?
-        WHERE vyletId = ? AND userId = ?");
+        WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Chyba přípravy SQL: ' . $conn->error, 'email' => $teacher_email, 'user_id' => $_SESSION['user_id']]);
+        $conn->close();
+        exit();
+    }
+    
     $stmt->bind_param(
-        "sssssssssssdsii",
+        "sssssssssssdsiss",
         $nazev, $adresa, $delka,
         $misto_tam, $cas_tam, $doprava_tam,
         $misto_zpet, $cas_zpet, $doprava_zpet,
         $harmonogram, $ucitele,
         $cena, $cislo_uctu,
-        $id, $_SESSION['user_id']
+        $id, $_SESSION['user_id'], $teacher_email
     );
 
-    if ($stmt->execute()) {
-        // Aktualizace tříd
-        $delTridy = $conn->prepare("DELETE FROM " . $env['TRIPS_CLASSES_TABLE'] . " WHERE vyletId = ?");
-        $delTridy->bind_param("i", $id);
-        $delTridy->execute();
-        $delTridy->close();
-
-        $tridy = $input['tridy'] ?? [];
-        foreach ($tridy as $trida) {
-            $ins = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
-            $ins->bind_param("is", $id, $trida);
-            $ins->execute();
-            $ins->close();
-        }
-
-        // Aktualizace stravy
-        $delStrava = $conn->prepare("DELETE FROM " . $env['TRIPS_MEALS_TABLE'] . " WHERE vyletId = ?");
-        $delStrava->bind_param("i", $id);
-        $delStrava->execute();
-        $delStrava->close();
-
-        $strava = $input['strava'] ?? [];
-        $insStrava = $conn->prepare("INSERT INTO " . $env['TRIPS_MEALS_TABLE'] . " 
-            (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        foreach ($strava as $den => $meals) {
-            foreach ($meals as $typ_jidla => $meal) {
-                $typ = $meal['typ'] ?? 'vlastni';
-                $nazev_rest = $meal['nazev_restaurace'] ?? null;
-                $adresa_rest = $meal['adresa_restaurace'] ?? null;
-                $kontakt_rest = $meal['kontakt_restaurace'] ?? null;
-                $cas = $meal['cas'] ?? null;
-                $vlastni_text = $meal['vlastni_text'] ?? null;
-                
-                $insStrava->bind_param(
-                    "iisssssss",
-                    $id, $den, $typ_jidla, $typ,
-                    $nazev_rest, $adresa_rest, $kontakt_rest, $cas, $vlastni_text
-                );
-                $insStrava->execute();
-            }
-        }
-        $insStrava->close();
-
-        echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně upraven']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Chyba při úpravě výletu']);
+    if (!$stmt->execute()) {
+        echo json_encode(['success' => false, 'message' => 'Chyba Execute: ' . $stmt->error, 'teacher_email' => $teacher_email]);
+        $stmt->close();
+        $conn->close();
+        exit();
     }
+    
+    // Aktualizace tříd
+    $delTridy = $conn->prepare("DELETE FROM " . $env['TRIPS_CLASSES_TABLE'] . " WHERE vyletId = ?");
+    $delTridy->bind_param("i", $id);
+    $delTridy->execute();
+    $delTridy->close();
+
+    $tridy = $input['tridy'] ?? [];
+    foreach ($tridy as $trida) {
+        $ins = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
+        $ins->bind_param("is", $id, $trida);
+        $ins->execute();
+        $ins->close();
+    }
+
+    // Aktualizace stravy
+    $delStrava = $conn->prepare("DELETE FROM " . $env['TRIPS_MEALS_TABLE'] . " WHERE vyletId = ?");
+    $delStrava->bind_param("i", $id);
+    $delStrava->execute();
+    $delStrava->close();
+
+    $strava = $input['strava'] ?? [];
+    $insStrava = $conn->prepare("INSERT INTO " . $env['TRIPS_MEALS_TABLE'] . " 
+        (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    foreach ($strava as $den => $meals) {
+        foreach ($meals as $typ_jidla => $meal) {
+            $typ = $meal['typ'] ?? 'vlastni';
+            $nazev_rest = $meal['nazev_restaurace'] ?? null;
+            $adresa_rest = $meal['adresa_restaurace'] ?? null;
+            $kontakt_rest = $meal['kontakt_restaurace'] ?? null;
+            $cas = $meal['cas'] ?? null;
+            $vlastni_text = $meal['vlastni_text'] ?? null;
+            
+            $insStrava->bind_param(
+                "iisssssss",
+                $id, $den, $typ_jidla, $typ,
+                $nazev_rest, $adresa_rest, $kontakt_rest, $cas, $vlastni_text
+            );
+            $insStrava->execute();
+        }
+    }
+    $insStrava->close();
+
+    echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně upraven']);
     $stmt->close();
     $conn->close();
     exit();
@@ -217,9 +245,10 @@ if ($method === 'DELETE') {
         exit();
     }
 
-    // Ověření, že výlet patří přihlášenému učiteli
-    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $check->bind_param("ii", $id, $_SESSION['user_id']);
+    // Ověření, že výlet patří přihlášenému učiteli NEBO se na něm podílí
+    $check = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    $teacher_email = $_SESSION['email'] ?? '';
+    $check->bind_param("iss", $id, $_SESSION['user_id'], $teacher_email);
     $check->execute();
     $checkResult = $check->get_result();
 
@@ -233,8 +262,8 @@ if ($method === 'DELETE') {
     $check->close();
 
     // Smažání výletu (CASCADE smaže i výlety_tridy a trip_photos)
-    $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $stmt->bind_param("ii", $id, $_SESSION['user_id']);
+    $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    $stmt->bind_param("iss", $id, $_SESSION['user_id'], $teacher_email);
 
     if ($stmt->execute() && $stmt->affected_rows > 0) {
         echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně smazán']);
@@ -255,6 +284,7 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         v.vyletId, 
         v.userId, 
         v.nazev_vyletu, 
+        v.nahledovy_obrazek,
         v.adresa_ubytovani, 
         v.delka_pobytu, 
         v.celkova_cena,
@@ -269,15 +299,22 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
     ORDER BY v.vyletId DESC";
 
     $stmt = $conn->prepare($query);
+    if (!$stmt) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Student prepare error: ' . $conn->error]);
+        $conn->close();
+        exit();
+    }
     $stmt->bind_param("s", $_SESSION['class']);
     $stmt->execute();
     $result = $stmt->get_result();
 } elseif ($_SESSION['role'] === 'teacher') {
-    // Pro učitele: pouze výlety, které sám vytvořil
+    // Pro učitele: výlety, které sám vytvořil NEBO na kterých se podílí
     $query = "SELECT 
         vyletId, 
         userId, 
         nazev_vyletu, 
+        nahledovy_obrazek,
         adresa_ubytovani, 
         delka_pobytu, 
         celkova_cena,
@@ -287,11 +324,17 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         cas_odjezdu_zpet,
         (SELECT COUNT(*) FROM " . $env['PHOTOS_TABLE'] . " tp WHERE tp.vyletId = " . $env['TRIPS_TABLE'] . ".vyletId) AS photo_count
     FROM " . $env['TRIPS_TABLE'] . " 
-    WHERE userId = ?
+    WHERE userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %')
     ORDER BY vyletId DESC";
 
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $_SESSION['user_id']);
+    if (!$stmt) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Prepare error: ' . $conn->error]);
+        exit();
+    }
+    $teacher_email = $_SESSION['email'] ?? '';
+    $stmt->bind_param("is", $_SESSION['user_id'], $teacher_email);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
@@ -300,6 +343,7 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
         vyletId, 
         userId, 
         nazev_vyletu, 
+        nahledovy_obrazek,
         adresa_ubytovani, 
         delka_pobytu, 
         celkova_cena,
@@ -312,6 +356,12 @@ if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
     ORDER BY vyletId DESC";
 
     $result = $conn->query($query);
+    if (!$result) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Admin query error: ' . $conn->error]);
+        $conn->close();
+        exit();
+    }
 }
 
 if ($result && $result->num_rows > 0) {
@@ -319,6 +369,7 @@ if ($result && $result->num_rows > 0) {
         $trips[] = [
             'id' => $row['vyletId'],
             'nazev' => $row['nazev_vyletu'],
+            'nahledovy_obrazek' => $row['nahledovy_obrazek'],
             'delka_pobytu' => $row['delka_pobytu'],
             'cena' => $row['celkova_cena'] ?? '0',
             'adresa' => $row['adresa_ubytovani'],
@@ -335,7 +386,13 @@ if ($result && $result->num_rows > 0) {
 echo json_encode([
     'success' => true,
     'trips' => $trips,
-    'count' => count($trips)
+    'count' => count($trips),
+    'debug' => [
+        'role' => $_SESSION['role'],
+        'user_id' => $_SESSION['user_id'] ?? null,
+        'email' => $_SESSION['email'] ?? null,
+        'class' => $_SESSION['class'] ?? null
+    ]
 ]);
 
 $conn->close();

@@ -401,20 +401,34 @@ document.querySelector('form').addEventListener('submit', function(e) {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            window.location.href = 'teacher.html';
-        } else {
-            alert(data.message || 'Chyba při ukládání výletu');
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP Error: ${res.status} ${res.statusText}`);
+        }
+        return res.text();
+    })
+    .then(text => {
+        console.log('Server response:', text);
+        try {
+            const data = JSON.parse(text);
+            if (data.success) {
+                alert(data.message);
+                window.location.href = 'teacher.html';
+            } else {
+                alert(data.message || 'Chyba při ukládání výletu');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Potvrdit a odeslat výlet';
+            }
+        } catch (e) {
+            console.error('JSON Parse Error:', e);
+            alert('Chyba serveru - neplatná odpověď: ' + text.substring(0, 200));
             submitBtn.disabled = false;
             submitBtn.textContent = 'Potvrdit a odeslat výlet';
         }
     })
     .catch(error => {
-        console.error('Chyba:', error);
-        alert('Chyba při ukládání výletu');
+        console.error('Fetch Error:', error);
+        alert('Chyba při komunikaci se serverem: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Potvrdit a odeslat výlet';
     });

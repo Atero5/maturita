@@ -31,13 +31,27 @@
         </ul>
     </nav>
 
-    <form>
+    <form method="POST" action="update_trip.php" enctype="multipart/form-data" id="tripForm">
         <button type="button" class="btn-back" onclick="window.history.back()">&larr; Zpět</button>
         <h1>Úprava výletu</h1>
+        
+        <!-- Skryté pole s ID výletu -->
+        <input type="hidden" name="vylet_id" id="vyletId">
         
         <h2>Základní informace</h2>
         <h3>Název výletu</h3>
         <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
+        
+        <h3>Náhledový obrázek</h3>
+        <input type="file" name="nahledovy_obrazek" accept="image/*" id="nahledovyObrazek">
+        <div id="obrazekPreview" style="margin-top: 10px; display: none;">
+            <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Náhled:</p>
+            <img id="previewImg" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <div id="obrazekCurrent" style="margin-top: 10px; display: none;">
+            <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Současný obrázek:</p>
+            <img id="currentImg" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
         
         <h3>Adresa ubytování</h3>
         <div class="address-container">

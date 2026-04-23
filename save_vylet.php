@@ -16,9 +16,14 @@ $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD']
 $conn->set_charset("utf8mb4");
 
 if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'Chyba připojení k DB.']);
+    echo json_encode(['success' => false, 'message' => 'Chyba připojení k DB: ' . $conn->connect_error]);
     exit;
 }
+
+// Přidáme debug záznam
+error_log("DEBUG: POST data - nazev: " . ($_POST['nazev_vyletu'] ?? 'CHYBÍ') . ", delka: " . ($_POST['delka_pobytu'] ?? 'CHYBÍ') . ", cena: " . ($_POST['celkova_cena'] ?? 'CHYBÍ'));
+error_log("DEBUG: Session - user_id: " . ($_SESSION['user_id'] ?? 'CHYBÍ') . ", email: " . ($_SESSION['email'] ?? 'CHYBÍ'));
+error_log("DEBUG: Počet tříd: " . count($_POST['tridy'] ?? []) . ", Strava set: " . (isset($_POST['strava']) ? 'ano' : 'ne'));
 
 // Načtení dat z POST
 $nazev_vyletu = $_POST['nazev_vyletu'] ?? '';
@@ -92,7 +97,7 @@ if (!empty($ostatni)) {
 }
 
 // Finance
-$cena = !empty($_POST['celkova_cena']) ? $_POST['celkova_cena'] : 0;
+$cena = !empty($_POST['celkova_cena']) ? (float)$_POST['celkova_cena'] : 0;
 $cislo_uctu = $_POST['cislo_uctu'] ?? null;
 
 // Příprava SQL dotazu
@@ -106,9 +111,14 @@ $sql = "INSERT INTO " . $env['TRIPS_TABLE'] . " (
 
 $stmt = $conn->prepare($sql);
 
+if (!$stmt) {
+    echo json_encode(['success' => false, 'message' => 'Chyba přípravy SQL: ' . $conn->error]);
+    exit;
+}
+
 $user_id = $_SESSION['user_id'];
 $stmt->bind_param(
-    "isssssssssssssds",
+    "issssssssssssds",
     $user_id, $nazev_vyletu, $nahledovy_obrazek, $adresa_ubytovani, $delka_pobytu,
     $misto_tam, $cas_tam, $doprava_tam,
     $misto_zpet, $cas_zpet, $doprava_zpet,
@@ -124,8 +134,16 @@ if ($stmt->execute()) {
 
     foreach ($tridy as $trida) {
         $stmt2 = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
+        if (!$stmt2) {
+            echo json_encode(['success' => false, 'message' => 'Chyba přípravy dotazu pro třídy: ' . $conn->error]);
+            exit;
+        }
         $stmt2->bind_param("is", $vylet_id, $trida);
-        $stmt2->execute();
+        if (!$stmt2->execute()) {
+            echo json_encode(['success' => false, 'message' => 'Chyba při ukládání třídy: ' . $stmt2->error]);
+            $stmt2->close();
+            exit;
+        }
         $stmt2->close();
     }
 
@@ -141,15 +159,23 @@ if ($stmt->execute()) {
             $vlastni_text = $data['vlastni_text'] ?? null;
 
             $stmtS = $conn->prepare("INSERT INTO " . $env['TRIPS_MEALS_TABLE'] . " (vyletId, den, typ_jidla, typ, nazev_restaurace, adresa_restaurace, kontakt_restaurace, cas, vlastni_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            if (!$stmtS) {
+                echo json_encode(['success' => false, 'message' => 'Chyba přípravy dotazu pro stravu: ' . $conn->error]);
+                exit;
+            }
             $stmtS->bind_param("iisssssss", $vylet_id, $den, $typ_jidla, $typ, $nazev_rest, $adresa_rest, $kontakt_rest, $cas, $vlastni_text);
-            $stmtS->execute();
+            if (!$stmtS->execute()) {
+                echo json_encode(['success' => false, 'message' => 'Chyba při ukládání stravy den ' . $den . ': ' . $stmtS->error]);
+                $stmtS->close();
+                exit;
+            }
             $stmtS->close();
         }
     }
 
     echo json_encode(['success' => true, 'message' => 'Výlet byl úspěšně naplánován a uložen!']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Chyba při ukládání: ' . $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Chyba při ukládání výletu: ' . $stmt->error]);
 }
 
 $stmt->close();

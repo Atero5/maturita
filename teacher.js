@@ -25,11 +25,13 @@ async function loadTrips() {
     try {
         const response = await fetch('api_trips.php');
         const data = await response.json();
+        console.log('API Response:', data);
         
-        if (data.success && data.trips.length > 0) {
+        if (data.success && data.trips && data.trips.length > 0) {
             allTrips = data.trips;
             filterAndRenderTrips();
         } else {
+            console.log('No trips found. Success:', data.success, 'Trips length:', data.trips?.length, 'Debug:', data.debug);
             allTrips = [];
             renderNoTripsMessage();
         }

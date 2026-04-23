@@ -26,11 +26,13 @@ if ($type === 'seznam') {
         echo 'Přístup odepřen';
         exit();
     }
+    $_GET['id'] = $id; // Přesuň $id do $_GET pro print_seznam.php
     ob_start();
     include 'print_seznam.php';
     $content = ob_get_clean();
     $filename = 'seznam_zaku.pdf';
 } elseif ($type === 'harmonogram') {
+    $_GET['id'] = $id; // Přesuň $id do $_GET pro print_harmonogram.php
     ob_start();
     include 'print_harmonogram.php';
     $content = ob_get_clean();
@@ -41,6 +43,7 @@ if ($type === 'seznam') {
         echo 'Přístup odepřen';
         exit();
     }
+    $_GET['id'] = $id; // Přesuň $id do $_GET pro print_cestovni_prikaz.php
     ob_start();
     include 'print_cestovni_prikaz.php';
     $content = ob_get_clean();
