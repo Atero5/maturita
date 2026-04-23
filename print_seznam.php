@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $env = parse_ini_file(__DIR__ . '/.env');
 
 if (!isset($_SESSION['user_id'])) {
@@ -15,7 +17,6 @@ if ($role !== 'teacher' && $role !== 'admin') {
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
-    echo 'Neplatné ID výletu.';
     exit();
 }
 
@@ -35,7 +36,6 @@ $trip = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$trip) {
-    echo 'Výlet nenalezen nebo nemáte oprávnění.';
     $conn->close();
     exit();
 }
@@ -120,7 +120,7 @@ function fmtDt($val) {
     </style>
 </head>
 <body>
-    <button class="btn-print" onclick="window.print()">🖨️ Uložit / Tisknout jako PDF</button>
+
 
     <h1><?= h($trip['nazev_vyletu']) ?></h1>
     <div class="subtitle">

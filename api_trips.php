@@ -30,13 +30,13 @@ if ($method === 'GET' && isset($_GET['id'])) {
 
     // Učitel/admin vidí vlastní výlety, student vidí výlety přiřazené jeho třídě
     if ($_SESSION['role'] === 'student' && isset($_SESSION['class'])) {
-        $stmt = $conn->prepare("SELECT v.* FROM " . $env['TRIPS_TABLE'] . " v INNER JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
+        $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId INNER JOIN " . $env['TRIPS_CLASSES_TABLE'] . " vt ON v.vyletId = vt.vyletId WHERE v.vyletId = ? AND vt.tridy = ?");
         $stmt->bind_param("is", $id, $_SESSION['class']);
     } elseif ($_SESSION['role'] === 'admin') {
-        $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
+        $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId WHERE v.vyletId = ?");
         $stmt->bind_param("i", $id);
     } else {
-        $stmt = $conn->prepare("SELECT * FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
+        $stmt = $conn->prepare("SELECT v.*, u.email AS creator_email FROM " . $env['TRIPS_TABLE'] . " v LEFT JOIN " . $env['USER_TABLE'] . " u ON v.userId = u.userId WHERE v.vyletId = ? AND v.userId = ?");
         $stmt->bind_param("ii", $id, $_SESSION['user_id']);
     }
     $stmt->execute();
@@ -83,6 +83,7 @@ if ($method === 'GET' && isset($_GET['id'])) {
                 'celkova_cena' => $row['celkova_cena'],
                 'cislo_uctu' => $row['cislo_uctu'],
                 'datum_vytvoreni' => $row['datum_vytvoreni'],
+                'creator_email' => $row['creator_email'] ?? null,
                 'strava' => $strava,
                 'tridy' => $tridy
             ]

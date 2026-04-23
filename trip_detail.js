@@ -189,6 +189,10 @@ function renderDetail(trip) {
                     <span class="detail-label">Učitelé</span>
                     <span class="detail-value">${escapeHtml(trip.uciitele || '—')}</span>
                 </div>
+                <div class="detail-item">
+                    <span class="detail-label">Zakladatel výletu</span>
+                    <span class="detail-value">${escapeHtml(trip.creator_email || '—')}</span>
+                </div>
             </div>
             ${mapUrl ? `<iframe class="detail-map" src="${mapUrl}" allowfullscreen></iframe>` : ''}
         </div>
