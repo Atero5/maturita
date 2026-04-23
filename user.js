@@ -93,24 +93,32 @@
                     minimumFractionDigits: 0
                 }).format(trip.cena || 0);
                 
+                // Náhledový obrázek - vlevo, nebo text "Obrázek není k dispozici"
+                const imageHtml = trip.nahledovy_obrazek 
+                    ? `<div class="trip-card-image"><img src="${escapeHtml(trip.nahledovy_obrazek)}" alt="Náhled"></div>` 
+                    : `<div class="trip-card-image trip-card-no-image"><span>Obrázek není k dispozici</span></div>`;
+                
                 card.innerHTML = `
-                    <a href="trip_detail.html?id=${trip.id}" style="text-decoration: none; color: inherit;">
-                        <h2 class="trip-card-title">${escapeHtml(trip.nazev)}</h2>
-                        <div class="trip-card-info">
-                            <div class="trip-card-row">
-                                <span class="trip-card-label">Délka pobytu:</span>
-                                <span class="trip-card-value">${escapeHtml(trip.delka_pobytu || 'N/A')}</span>
+                    <a href="trip_detail.html?id=${trip.id}" style="text-decoration: none; color: inherit; display: flex; gap: 15px;">
+                        ${imageHtml}
+                        <div class="trip-card-content">
+                            <h2 class="trip-card-title">${escapeHtml(trip.nazev)}</h2>
+                            <div class="trip-card-info">
+                                <div class="trip-card-row">
+                                    <span class="trip-card-label">Délka pobytu:</span>
+                                    <span class="trip-card-value">${escapeHtml(trip.delka_pobytu || 'N/A')}</span>
+                                </div>
+                                <div class="trip-card-row">
+                                    <span class="trip-card-label">Místo odjezdu:</span>
+                                    <span class="trip-card-value">${escapeHtml(trip.misto || 'N/A')}</span>
+                                </div>
+                                <div class="trip-card-row">
+                                    <span class="trip-card-label">Čas odjezdu:</span>
+                                    <span class="trip-card-value">${escapeHtml(formatDateTime(trip.cas))}</span>
+                                </div>
                             </div>
-                            <div class="trip-card-row">
-                                <span class="trip-card-label">Místo odjezdu:</span>
-                                <span class="trip-card-value">${escapeHtml(trip.misto || 'N/A')}</span>
-                            </div>
-                            <div class="trip-card-row">
-                                <span class="trip-card-label">Čas odjezdu:</span>
-                                <span class="trip-card-value">${escapeHtml(formatDateTime(trip.cas))}</span>
-                            </div>
+                            <div class="trip-card-price">Cena: ${cenaFormatted}</div>
                         </div>
-                        <div class="trip-card-price">Cena: ${cenaFormatted}</div>
                     </a>
                 `;
                 

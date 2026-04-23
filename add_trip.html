@@ -48,6 +48,12 @@
             <h3>Název výletu</h3>
             <input type="text" name="nazev_vyletu" placeholder="Zadejte název..." required>
             
+            <h3>Náhledový obrázek</h3>
+            <input type="file" name="nahledovy_obrazek" accept="image/*" id="nahledovyObrazek">
+            <div id="obrazekPreview" style="margin-top: 10px; display: none;">
+                <img id="previewImg" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
             <h3>Adresa ubytování</h3>
             <div class="address-container">
                 <input id="address" type="text" name="adresa_ubytovani" placeholder="Zadejte adresu..." required>

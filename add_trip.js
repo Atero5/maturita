@@ -80,6 +80,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     loadClasses();
+    
+    // Náhled obrázku
+    document.getElementById('nahledovyObrazek').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('obrazekPreview');
+        const img = document.getElementById('previewImg');
+        
+        if (file) {
+            // Kontrola typu souboru
+            if (!file.type.startsWith('image/')) {
+                alert('Vyberte prosím obrázek.');
+                this.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            // Kontrola velikosti (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Obrázek je příliš velký. Maximální velikost je 5MB.');
+                this.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
 });
 
 // Původní funkce pro mapu

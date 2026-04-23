@@ -30,7 +30,7 @@ if ($method === 'GET') {
     // Detail jednoho výletu
     if (isset($_GET['id'])) {
         $id = (int)$_GET['id'];
-        $stmt = $conn->prepare("SELECT vyletId, nazev_vyletu, adresa_ubytovani, delka_pobytu, celkova_cena, misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
+        $stmt = $conn->prepare("SELECT vyletId, nazev_vyletu, nahledovy_obrazek, adresa_ubytovani, delka_pobytu, celkova_cena, misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -41,6 +41,7 @@ if ($method === 'GET') {
                 'trip' => [
                     'id' => $row['vyletId'],
                     'nazev' => $row['nazev_vyletu'],
+                    'nahledovy_obrazek' => $row['nahledovy_obrazek'],
                     'adresa' => $row['adresa_ubytovani'],
                     'delka_pobytu' => $row['delka_pobytu'],
                     'cena' => $row['celkova_cena'],

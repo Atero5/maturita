@@ -136,7 +136,9 @@ function renderCalendar(date) {
             <div id="dayView" style="display: none;">
                 <div class="day-view-header">
                     <button id="backToCalendar" class="btn-back">← Zpět do kalendáře</button>
+                    <button id="prevDayBtn" class="btn-back">←</button>
                     <h2 id="dayViewDate"></h2>
+                    <button id="nextDayBtn" class="btn-back">→</button>
                 </div>
                 <div id="dayViewTasks" class="day-view-tasks" style="min-height: 200px; border: 2px dashed #ccc; padding: 15px; border-radius: 5px; background-color: #f9f9f9;">
                     <!-- Tasks will be populated here -->
@@ -144,7 +146,7 @@ function renderCalendar(date) {
             </div>
         `;
         document.getElementById('calendarWidget').insertAdjacentHTML('beforeend', dayViewHtml);
-        
+
         // Přidat event listener pro back button
         document.getElementById('backToCalendar').addEventListener('click', function() {
             const dayView = document.getElementById('dayView');
@@ -154,8 +156,27 @@ function renderCalendar(date) {
             window.currentSelectedDate = null;
             dayView.style.display = 'none';
             calendarHeader.style.display = 'flex';
-            calendarWeekdays.style.display = 'flex';
+            calendarWeekdays.style.display = 'grid';
             calendarGrid.style.display = 'grid';
+        });
+
+        // Navigace na předchozí/ další den
+        document.getElementById('prevDayBtn').addEventListener('click', function() {
+            if (!window.currentSelectedDate) return;
+            const [year, month, day] = window.currentSelectedDate.split('-').map(Number);
+            const prevDate = new Date(year, month - 1, day - 1);
+            // Pokud jsme na začátku měsíce, posuneme na předchozí měsíc
+            const prevDateKey = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`;
+            window.currentSelectedDate = prevDateKey;
+            toggleDay(null, prevDateKey);
+        });
+        document.getElementById('nextDayBtn').addEventListener('click', function() {
+            if (!window.currentSelectedDate) return;
+            const [year, month, day] = window.currentSelectedDate.split('-').map(Number);
+            const nextDate = new Date(year, month - 1, day + 1);
+            const nextDateKey = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+            window.currentSelectedDate = nextDateKey;
+            toggleDay(null, nextDateKey);
         });
         
         // Přidat event listeners pro drop zone v dayViewTasks
@@ -278,6 +299,17 @@ function getDayTasks(dateKey) {
 }
 
 function assignTaskToDay(taskId, dateKey) {
+    // Kontrola, zda je datum dnes nebo v budoucnu
+    const today = new Date();
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day);
+    today.setHours(0,0,0,0);
+    selectedDate.setHours(0,0,0,0);
+    if (selectedDate < today) {
+        alert('Nelze přiřadit úkol do již uplynulého dne.');
+        return;
+    }
+
     const dayView = document.getElementById('dayView');
     const dayViewWasOpen = dayView && dayView.style.display !== 'none';
 

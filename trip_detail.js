@@ -154,6 +154,11 @@ function renderDetail(trip) {
     // Třídy
     const tridyHtml = (trip.tridy || []).map(t => `<span class="class-tag">${escapeHtml(t)}</span>`).join('');
 
+    // Náhledový obrázek
+    const nahledovyObrazekHtml = trip.nahledovy_obrazek 
+        ? `<div class="trip-preview-image"><img src="${escapeHtml(trip.nahledovy_obrazek)}" alt="Náhledový obrázek"></div>` 
+        : `<div class="trip-preview-image trip-preview-no-image"><span>Obrázek není k dispozici</span></div>`;
+
     // Mapa
     const mapUrl = trip.adresa_ubytovani
         ? `https://maps.google.com/maps?q=${encodeURIComponent(trip.adresa_ubytovani)}&output=embed`
@@ -161,6 +166,7 @@ function renderDetail(trip) {
 
     container.innerHTML = `
         <h1 class="trip-title">${escapeHtml(trip.nazev_vyletu || 'Bez názvu')}</h1>
+        ${nahledovyObrazekHtml}
         <div class="pdf-actions">
             <button class="btn-pdf" type="button" onclick="downloadPDF('harmonogram', ${trip.id})">📄 Harmonogram (PDF)</button>
             ${(userRole === 'teacher' || userRole === 'admin') ? `

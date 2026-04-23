@@ -70,6 +70,7 @@ if ($method === 'GET' && isset($_GET['id'])) {
             'trip' => [
                 'id' => $row['vyletId'],
                 'nazev_vyletu' => $row['nazev_vyletu'],
+                'nahledovy_obrazek' => $row['nahledovy_obrazek'],
                 'adresa_ubytovani' => $row['adresa_ubytovani'],
                 'delka_pobytu' => $row['delka_pobytu'],
                 'misto_odjezdu_tam' => $row['misto_odjezdu_tam'],

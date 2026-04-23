@@ -28,6 +28,44 @@ if ($delka_pobytu === 'jine') {
     $delka_pobytu = $_POST['delka_pobytu_custom'] ?? null;
 }
 
+// Zpracování náhledového obrázku
+$nahledovy_obrazek = null;
+if (isset($_FILES['nahledovy_obrazek']) && $_FILES['nahledovy_obrazek']['error'] === UPLOAD_ERR_OK) {
+    $file = $_FILES['nahledovy_obrazek'];
+    
+    // Kontrola typu souboru
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!in_array($file['type'], $allowedTypes)) {
+        echo json_encode(['success' => false, 'message' => 'Neplatný typ souboru. Povolené formáty: JPEG, PNG, GIF, WebP.']);
+        exit;
+    }
+    
+    // Kontrola velikosti (max 5MB)
+    if ($file['size'] > 5 * 1024 * 1024) {
+        echo json_encode(['success' => false, 'message' => 'Obrázek je příliš velký. Maximální velikost je 5MB.']);
+        exit;
+    }
+    
+    // Vytvoření složky pro obrázky, pokud neexistuje
+    $uploadDir = __DIR__ . '/pictures/trips/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    // Generování unikátního názvu souboru
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid('trip_preview_', true) . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    // Přesun souboru
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        $nahledovy_obrazek = 'pictures/trips/' . $filename;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Chyba při ukládání obrázku.']);
+        exit;
+    }
+}
+
 $misto_tam = $_POST['misto_odjezdu_tam'] ?? null;
 $cas_tam = $_POST['cas_odjezdu_tam'] ?? null;
 $doprava_tam = $_POST['dopravni_prostredek_tam'] ?? null;
@@ -59,19 +97,19 @@ $cislo_uctu = $_POST['cislo_uctu'] ?? null;
 
 // Příprava SQL dotazu
 $sql = "INSERT INTO " . $env['TRIPS_TABLE'] . " (
-    userId, nazev_vyletu, adresa_ubytovani, delka_pobytu, 
+    userId, nazev_vyletu, nahledovy_obrazek, adresa_ubytovani, delka_pobytu, 
     misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, 
     misto_odjezdu_zpet, cas_odjezdu_zpet, dopravni_prostredek_zpet, 
     harmonogram, uciitele,
     celkova_cena, cislo_uctu
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
 
 $user_id = $_SESSION['user_id'];
 $stmt->bind_param(
-    "isssssssssssds",
-    $user_id, $nazev_vyletu, $adresa_ubytovani, $delka_pobytu,
+    "isssssssssssssds",
+    $user_id, $nazev_vyletu, $nahledovy_obrazek, $adresa_ubytovani, $delka_pobytu,
     $misto_tam, $cas_tam, $doprava_tam,
     $misto_zpet, $cas_zpet, $doprava_zpet,
     $harmonogram, $ucitele,
