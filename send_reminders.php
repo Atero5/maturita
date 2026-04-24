@@ -25,15 +25,23 @@ $reminderDays = isset($env['REMINDER_DAYS']) ? (int)$env['REMINDER_DAYS'] : 7;
 $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 $conn->set_charset('utf8mb4');
 
-// Najdi výlety, jejichž odjezd je za přesně $reminderDays dní
-$targetDate = (new DateTime())->modify("+{$reminderDays} days")->format('Y-m-d');
+// Najdi výlety, které splňují podmínky:
+// 1. Odjezd je za přesně $reminderDays dní
+// 2. NEBO odjezd je v minulosti (včetně dnešního dne)
+$today = new DateTime();
+$todayStr = $today->format('Y-m-d');
+$targetDateMax = (new DateTime())->modify("+{$reminderDays} days")->format('Y-m-d');
+$tomorrowStr = (new DateTime())->modify('+1 day')->format('Y-m-d');
 
+// Odešli připomínky pro výlety, jejichž odjezd je v rozmezí zítra až REMINDER_DAYS dní
+// (tedy 1–7 dní před odjezdem, v den odjezdu ani po něm se neposílá)
 $stmt = $conn->prepare(
     "SELECT vyletId, nazev_vyletu, cas_odjezdu_tam, celkova_cena, cislo_uctu
      FROM " . $env['TRIPS_TABLE'] . "
-     WHERE DATE(cas_odjezdu_tam) = ?"
+     WHERE DATE(cas_odjezdu_tam) >= ?
+       AND DATE(cas_odjezdu_tam) <= ?"
 );
-$stmt->bind_param('s', $targetDate);
+$stmt->bind_param('ss', $tomorrowStr, $targetDateMax);
 $stmt->execute();
 $trips = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
@@ -68,11 +76,18 @@ foreach ($trips as $trip) {
     // Načti přihlášené studenty ze tříd výletu
     $placeholders = implode(',', array_fill(0, count($tridy), '?'));
     $types = str_repeat('s', count($tridy));
-    $stmt = $conn->prepare(
-        "SELECT userId, email, parent_email FROM " . $env['USER_TABLE'] . "
-         WHERE role = 'student' AND class IN ($placeholders)"
-    );
-    $stmt->bind_param($types, ...$tridy);
+    $sql = "SELECT u.userId, u.email, u.parent_email FROM " . $env['USER_TABLE'] . " u
+         LEFT JOIN trip_platby tp ON tp.userId = u.userId AND tp.vyletId = ?
+         WHERE u.role = 'student' AND u.class IN ($placeholders)
+         AND (tp.zaplaceno IS NULL OR tp.zaplaceno = 0)";
+    
+    $stmt = $conn->prepare($sql);
+    
+    // Vytvořit types string pro bind_param - i na začátek pro vyletId
+    $bindTypes = 'i' . $types;
+    $bindParams = array_merge([$vyletId], $tridy);
+    
+    $stmt->bind_param($bindTypes, ...$bindParams);
     $stmt->execute();
     $studenti = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
@@ -88,10 +103,14 @@ foreach ($trips as $trip) {
     $cena    = number_format((float)$trip['celkova_cena'], 0, ',', ' ') . ' Kč';
     $ucet    = $trip['cislo_uctu'] ?: '—';
 
+    $odjezdDate = new DateTime($trip['cas_odjezdu_tam']);
+    $odjezdDate->setTime(0, 0, 0);
+    $daysLeft = (new DateTime($todayStr))->diff($odjezdDate)->days;
+
     $subject = "Připomínka platby: {$nazev}";
     $body = "
         <p>Dobrý den,</p>
-        <p>připomínáme, že za <strong>{$reminderDays} dní</strong> odjíždíte na výlet <strong>" . htmlspecialchars($nazev) . "</strong>.</p>
+        <p>připomínáme, že za <strong>{$daysLeft} " . ($daysLeft === 1 ? 'den' : 'dní') . "</strong> odjíždíte na výlet <strong>" . htmlspecialchars($nazev) . "</strong>.</p>
         <table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;'>
             <tr><td style='padding:4px 12px 4px 0;color:#666;'>Datum odjezdu:</td><td><strong>{$odjezd}</strong></td></tr>
             <tr><td style='padding:4px 12px 4px 0;color:#666;'>Celková cena:</td><td><strong>{$cena}</strong></td></tr>

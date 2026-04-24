@@ -147,6 +147,36 @@ if ($stmt->execute()) {
         $stmt2->close();
     }
 
+    // Vytvoření záznamů o platbách pro všechny studenty z vybraných tříd
+    $placeholders = implode(',', array_fill(0, count($tridy), '?'));
+    $types = str_repeat('s', count($tridy));
+    
+    // Načti všechny studenty z vybraných tříd
+    $stmtStudents = $conn->prepare(
+        "SELECT userId FROM " . $env['USER_TABLE'] . " 
+         WHERE role = 'student' AND class IN ($placeholders)"
+    );
+    if ($stmtStudents) {
+        $stmtStudents->bind_param($types, ...$tridy);
+        $stmtStudents->execute();
+        $resultStudents = $stmtStudents->get_result();
+        
+        // Vytvoř záznam o platbě pro každého studenta
+        while ($studentRow = $resultStudents->fetch_assoc()) {
+            $student_id = $studentRow['userId'];
+            $stmtPayment = $conn->prepare(
+                "INSERT INTO trip_platby (vyletId, userId, zaplaceno) VALUES (?, ?, 0)
+                 ON DUPLICATE KEY UPDATE zaplaceno = zaplaceno"
+            );
+            if ($stmtPayment) {
+                $stmtPayment->bind_param("ii", $vylet_id, $student_id);
+                $stmtPayment->execute();
+                $stmtPayment->close();
+            }
+        }
+        $stmtStudents->close();
+    }
+
     // Uložení stravy do tabulky vylety_strava
     $strava = $_POST['strava'] ?? [];
     foreach ($strava as $den => $meals) {

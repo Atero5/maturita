@@ -190,8 +190,9 @@ function hasAccessToTrip($conn, $env, $vyletId, $userId, $role) {
     if ($role === 'admin') return true;
 
     if ($role === 'teacher') {
-        $stmt = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-        $stmt->bind_param("ii", $vyletId, $userId);
+        $teacher_email = $_SESSION['email'] ?? '';
+        $stmt = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+        $stmt->bind_param("iis", $vyletId, $userId, $teacher_email);
     } else {
         $class = $_SESSION['class'] ?? '';
         $stmt = $conn->prepare("SELECT vt.vyletId FROM " . $env['TRIPS_CLASSES_TABLE'] . " vt WHERE vt.vyletId = ? AND vt.tridy = ?");
@@ -216,8 +217,11 @@ function canUploadPhotos($conn, $env, $vyletId) {
 }
 
 function isTripOwner($conn, $env, $vyletId, $userId) {
-    $stmt = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND userId = ?");
-    $stmt->bind_param("ii", $vyletId, $userId);
+    $role = $_SESSION['role'] ?? '';
+    if ($role === 'admin') return true;
+    $teacher_email = $_SESSION['email'] ?? '';
+    $stmt = $conn->prepare("SELECT vyletId FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ? AND (userId = ? OR CONCAT(', ', uciitele, ', ') LIKE CONCAT('%, ', ?, ', %'))");
+    $stmt->bind_param("iis", $vyletId, $userId, $teacher_email);
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->num_rows > 0;

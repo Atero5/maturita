@@ -182,17 +182,71 @@ if (!$stmt->execute()) {
 }
 
 // Aktualizace tříd
+// Nejdřív si zapamatuj, kdo už zaplatil
+$paidStudents = [];
+$getPaidStmt = $conn->prepare("SELECT userId FROM trip_platby WHERE vyletId = ? AND zaplaceno = 1");
+$getPaidStmt->bind_param("i", $vylet_id);
+$getPaidStmt->execute();
+$paidResult = $getPaidStmt->get_result();
+while ($row = $paidResult->fetch_assoc()) {
+    $paidStudents[] = (int)$row['userId'];
+}
+$getPaidStmt->close();
+
+// Smaž staré třídy
 $delTridy = $conn->prepare("DELETE FROM " . $env['TRIPS_CLASSES_TABLE'] . " WHERE vyletId = ?");
 $delTridy->bind_param("i", $vylet_id);
 $delTridy->execute();
 $delTridy->close();
 
+// Smaž staré záznamy o platbách
+$delPayments = $conn->prepare("DELETE FROM trip_platby WHERE vyletId = ?");
+$delPayments->bind_param("i", $vylet_id);
+$delPayments->execute();
+$delPayments->close();
+
+// Vlož nové třídy
 $tridy = $_POST['tridy'] ?? [];
 foreach ($tridy as $trida) {
     $stmtTrida = $conn->prepare("INSERT INTO " . $env['TRIPS_CLASSES_TABLE'] . " (vyletId, tridy) VALUES (?, ?)");
     $stmtTrida->bind_param("is", $vylet_id, $trida);
     $stmtTrida->execute();
     $stmtTrida->close();
+}
+
+// Vytvoř nové záznamy o platbách pro studenty z nových tříd
+if (!empty($tridy)) {
+    $placeholders = implode(',', array_fill(0, count($tridy), '?'));
+    $types = str_repeat('s', count($tridy));
+    
+    // Načti všechny studenty z nových tříd
+    $stmtStudents = $conn->prepare(
+        "SELECT userId FROM " . $env['USER_TABLE'] . " 
+         WHERE role = 'student' AND class IN ($placeholders)"
+    );
+    if ($stmtStudents) {
+        $stmtStudents->bind_param($types, ...$tridy);
+        $stmtStudents->execute();
+        $resultStudents = $stmtStudents->get_result();
+        
+        // Vytvoř záznam o platbě pro každého studenta
+        while ($studentRow = $resultStudents->fetch_assoc()) {
+            $student_id = (int)$studentRow['userId'];
+            // Pokud student zaplatil, nastav zaplaceno = 1, jinak 0
+            $zaplaceno = in_array($student_id, $paidStudents) ? 1 : 0;
+            
+            $stmtPayment = $conn->prepare(
+                "INSERT INTO trip_platby (vyletId, userId, zaplaceno) VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE zaplaceno = zaplaceno"
+            );
+            if ($stmtPayment) {
+                $stmtPayment->bind_param("iii", $vylet_id, $student_id, $zaplaceno);
+                $stmtPayment->execute();
+                $stmtPayment->close();
+            }
+        }
+        $stmtStudents->close();
+    }
 }
 
 // Aktualizace stravy
