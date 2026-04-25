@@ -18,7 +18,14 @@ require __DIR__ . '/phpmailer/Exception.php';
 require __DIR__ . '/phpmailer/PHPMailer.php';
 require __DIR__ . '/phpmailer/SMTP.php';
 
-$env = parse_ini_file(__DIR__ . '/.env');
+$envFile = __DIR__ . '/.env';
+if (!file_exists($envFile)) {
+    die("[CHYBA] .env soubor nenalezen: {$envFile}\n");
+}
+$env = parse_ini_file($envFile);
+if ($env === false) {
+    die("[CHYBA] Nepodařilo se načíst .env soubor: {$envFile}\n");
+}
 
 $reminderDays = isset($env['REMINDER_DAYS']) ? (int)$env['REMINDER_DAYS'] : 7;
 
