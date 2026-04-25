@@ -30,7 +30,7 @@ if ($method === 'GET') {
     // Detail jednoho výletu
     if (isset($_GET['id'])) {
         $id = (int)$_GET['id'];
-        $stmt = $conn->prepare("SELECT vyletId, nazev_vyletu, nahledovy_obrazek, adresa_ubytovani, delka_pobytu, celkova_cena, misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
+        $stmt = $conn->prepare("SELECT vyletId, nazev_vyletu, nahledovy_obrazek, adresa_ubytovani, delka_pobytu, celkova_cena, cislo_uctu, misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, misto_odjezdu_zpet, cas_odjezdu_zpet, dopravni_prostredek_zpet, harmonogram, uciitele FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -45,9 +45,15 @@ if ($method === 'GET') {
                     'adresa' => $row['adresa_ubytovani'],
                     'delka_pobytu' => $row['delka_pobytu'],
                     'cena' => $row['celkova_cena'],
+                    'cislo_uctu' => $row['cislo_uctu'],
                     'misto' => $row['misto_odjezdu_tam'],
                     'cas' => $row['cas_odjezdu_tam'],
-                    'doprava' => $row['dopravni_prostredek_tam']
+                    'doprava' => $row['dopravni_prostredek_tam'],
+                    'misto_zpet' => $row['misto_odjezdu_zpet'],
+                    'cas_zpet' => $row['cas_odjezdu_zpet'],
+                    'doprava_zpet' => $row['dopravni_prostredek_zpet'],
+                    'harmonogram' => $row['harmonogram'],
+                    'ucitele' => $row['uciitele']
                 ]
             ]);
         } else {
@@ -173,10 +179,16 @@ elseif ($method === 'PUT') {
     $misto = $input['misto'] ?? '';
     $cas = $input['cas'] ?? '';
     $doprava = $input['doprava'] ?? '';
+    $misto_zpet = $input['misto_zpet'] ?? '';
+    $cas_zpet = $input['cas_zpet'] ?? '';
+    $doprava_zpet = $input['doprava_zpet'] ?? '';
+    $harmonogram = $input['harmonogram'] ?? '';
+    $ucitele = $input['ucitele'] ?? '';
     $cena = !empty($input['cena']) ? $input['cena'] : 0;
+    $cislo_uctu = $input['cislo_uctu'] ?? '';
 
-    $stmt = $conn->prepare("UPDATE " . $env['TRIPS_TABLE'] . " SET nazev_vyletu = ?, adresa_ubytovani = ?, delka_pobytu = ?, misto_odjezdu_tam = ?, cas_odjezdu_tam = ?, dopravni_prostredek_tam = ?, celkova_cena = ? WHERE vyletId = ?");
-    $stmt->bind_param("ssssssdi", $nazev, $adresa, $delka, $misto, $cas, $doprava, $cena, $id);
+    $stmt = $conn->prepare("UPDATE " . $env['TRIPS_TABLE'] . " SET nazev_vyletu = ?, adresa_ubytovani = ?, delka_pobytu = ?, misto_odjezdu_tam = ?, cas_odjezdu_tam = ?, dopravni_prostredek_tam = ?, misto_odjezdu_zpet = ?, cas_odjezdu_zpet = ?, dopravni_prostredek_zpet = ?, harmonogram = ?, uciitele = ?, celkova_cena = ?, cislo_uctu = ? WHERE vyletId = ?");
+    $stmt->bind_param("sssssssssssdsi", $nazev, $adresa, $delka, $misto, $cas, $doprava, $misto_zpet, $cas_zpet, $doprava_zpet, $harmonogram, $ucitele, $cena, $cislo_uctu, $id);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Výlet upraven']);

@@ -27,16 +27,23 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 15;
 $offset = ($page - 1) * $limit;
 
-// Get total count
-$total_result = $conn->query("SELECT COUNT(*) as total FROM " . $env['USER_TABLE'] . " WHERE role != 'admin'");
-$total_row = $total_result->fetch_assoc();
-$total_users = $total_row['total'];
-
 // Get paginated users
-$result = $conn->query("SELECT userId, email, class, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' LIMIT $limit OFFSET $offset");
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$where = "role != 'admin'";
+if ($search !== '') {
+    $where .= " AND email LIKE '%" . $conn->real_escape_string($search) . "%'";
+}
+
+// Total with filters
+$total_result = $conn->query("SELECT COUNT(*) as total FROM " . $env['USER_TABLE'] . " WHERE $where");
+$total_users = $total_result->fetch_assoc()['total'];
+
+// Paginated with filters
+$result = $conn->query("SELECT userId, email, class, role FROM " . $env['USER_TABLE'] . " WHERE $where LIMIT $limit OFFSET $offset");
 while($row = $result->fetch_assoc()) {
     $users[] = $row;
 }
+
 
 // 3. Odeslání dat do HTML
 echo json_encode([

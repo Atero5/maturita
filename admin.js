@@ -1,30 +1,34 @@
     let currentPage = 1;
 
+
+
+
     async function loadAdminData(page = 1) {
         currentPage = page;
+        const search = document.getElementById('filter-email')?.value.trim() || '';
+        const params = new URLSearchParams({ page, search });
         try {
-            const response = await fetch(`api_admin.php?page=${page}`);
-            
+            const response = await fetch(`api_admin.php?${params}`);
             if (response.status === 403) {
                 window.location.href = "login.html";
                 return;
             }
-
             const data = await response.json();
-
-            // 1. email admina
             document.getElementById('admin-email').textContent = data.admin_email;
-
-            // 2.  řádky tabulky
             const tableBody = document.getElementById('users-table-body');
-            tableBody.innerHTML = ''; // Vyčistit tabulku
-
+            tableBody.innerHTML = '';
             data.users.forEach(user => {
                 const row = `
                     <tr>
                         <td>${user.userId}</td>
                         <td>${user.email}</td>
-                        <td>${user.class || '—'}</td>
+                        <td>
+                            <form method="post" action="update_class.php" style="display:inline;">
+                                <input type="hidden" name="id" value="${user.userId}">
+                                <input type="text" name="class" value="${user.class || ''}" style="width:60px;">
+                                <button type="submit" style="padding:2px 8px;">Uložit</button>
+                            </form>
+                        </td>
                         <td>${user.role}</td>
                         <td>
                             <a href="change_role.php?id=${user.userId}&role=student">Student</a> |
@@ -40,16 +44,9 @@
                 `;
                 tableBody.innerHTML += row;
             });
-
-            // 3.  pagination controls
             generatePagination(data.total, data.limit);
-
-            // 4. Zobrazíme stránku
             document.body.style.display = 'block';
-
-            // Načtení výletů až po ověření admina
             loadAdminTrips();
-
         } catch (error) {
             console.error("Chyba:", error);
             alert("Nepodařilo se načíst data.");
@@ -112,7 +109,6 @@
                     <td>${cenaFormatted}</td>
                     <td>${escapeHtml(trip.tridy || '')}</td>
                     <td>
-                        <a href="#" class="btn-edit" onclick="openEditModal(${trip.id}); return false;">Upravit</a> |
                         <a href="#" class="btn-delete" onclick="deleteTrip(${trip.id}); return false;">Smazat</a>
                     </td>
                 `;
@@ -172,15 +168,22 @@
             const data = await response.json();
             if (!data.success) return;
 
+
             const trip = data.trip;
-            document.getElementById('edit-trip-id').value = trip.id;
-            document.getElementById('edit-nazev').value = trip.nazev || '';
-            document.getElementById('edit-adresa').value = trip.adresa || '';
-            document.getElementById('edit-delka').value = trip.delka_pobytu || '';
-            document.getElementById('edit-misto').value = trip.misto || '';
-            document.getElementById('edit-cas').value = trip.cas || '';
-            document.getElementById('edit-doprava').value = trip.doprava || '';
-            document.getElementById('edit-cena').value = trip.cena || '';
+            document.getElementById('edit-trip-id').value = trip.id ?? '';
+            document.getElementById('edit-nazev').value = trip.nazev ?? '';
+            document.getElementById('edit-adresa').value = trip.adresa ?? '';
+            document.getElementById('edit-delka').value = trip.delka_pobytu ?? '';
+            document.getElementById('edit-harmonogram').value = trip.harmonogram ?? '';
+            document.getElementById('edit-ucitele').value = trip.ucitele ?? '';
+            document.getElementById('edit-misto').value = trip.misto ?? '';
+            document.getElementById('edit-cas').value = trip.cas ?? '';
+            document.getElementById('edit-doprava').value = trip.doprava ?? '';
+            document.getElementById('edit-misto-zpet').value = trip.misto_zpet ?? '';
+            document.getElementById('edit-cas-zpet').value = trip.cas_zpet ?? '';
+            document.getElementById('edit-doprava-zpet').value = trip.doprava_zpet ?? '';
+            document.getElementById('edit-cena').value = trip.cena ?? '';
+            document.getElementById('edit-cislo-uctu').value = trip.cislo_uctu ?? '';
 
             document.getElementById('editTripModal').classList.add('active');
         } catch (error) {
@@ -199,10 +202,16 @@
             nazev: document.getElementById('edit-nazev').value,
             adresa: document.getElementById('edit-adresa').value,
             delka_pobytu: document.getElementById('edit-delka').value,
+            harmonogram: document.getElementById('edit-harmonogram').value,
+            ucitele: document.getElementById('edit-ucitele').value,
             misto: document.getElementById('edit-misto').value,
             cas: document.getElementById('edit-cas').value,
             doprava: document.getElementById('edit-doprava').value,
-            cena: document.getElementById('edit-cena').value
+            misto_zpet: document.getElementById('edit-misto-zpet').value,
+            cas_zpet: document.getElementById('edit-cas-zpet').value,
+            doprava_zpet: document.getElementById('edit-doprava-zpet').value,
+            cena: document.getElementById('edit-cena').value,
+            cislo_uctu: document.getElementById('edit-cislo-uctu').value
         };
 
         try {

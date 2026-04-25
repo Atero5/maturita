@@ -31,7 +31,12 @@
 <h1>Admin panel</h1>
 <p>Přihlášen jako: <strong id="admin-email">...</strong></p>
 
+
+
 <h2>Uživatelé</h2>
+
+
+
 <table>
     <thead>
         <tr>
@@ -81,18 +86,42 @@
         
         <label>Délka pobytu</label>
         <input type="text" id="edit-delka">
-        
+
+        <label>Harmonogram</label>
+        <textarea id="edit-harmonogram" style="width:100%; padding:8px; margin-top:4px; box-sizing:border-box;" rows="4"></textarea>
+
+        <label>Učitelé</label>
+        <input type="text" id="edit-ucitele">
+
+        <h3 style="margin:16px 0 4px;">Doprava tam</h3>
+
         <label>Místo odjezdu (tam)</label>
         <input type="text" id="edit-misto">
         
         <label>Čas odjezdu (tam)</label>
-        <input type="text" id="edit-cas">
+        <input type="datetime-local" id="edit-cas">
         
         <label>Dopravní prostředek (tam)</label>
         <input type="text" id="edit-doprava">
+
+        <h3 style="margin:16px 0 4px;">Doprava zpět</h3>
+
+        <label>Místo odjezdu (zpět)</label>
+        <input type="text" id="edit-misto-zpet">
+
+        <label>Čas odjezdu (zpět)</label>
+        <input type="datetime-local" id="edit-cas-zpet">
+
+        <label>Dopravní prostředek (zpět)</label>
+        <input type="text" id="edit-doprava-zpet">
+
+        <h3 style="margin:16px 0 4px;">Finance</h3>
         
-        <label>Celková cena</label>
-        <input type="text" id="edit-cena">
+        <label>Celková cena (Kč)</label>
+        <input type="number" id="edit-cena" min="0">
+
+        <label>Číslo účtu</label>
+        <input type="text" id="edit-cislo-uctu">
         
         <div class="modal-buttons">
             <button class="btn-save" onclick="saveTrip()">Uložit</button>
