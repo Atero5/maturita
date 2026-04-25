@@ -19,4 +19,4 @@ cookies.txt
 # /uploads/
 
 # Local environment
-.env.local
+.env
