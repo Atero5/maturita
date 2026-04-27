@@ -23,6 +23,30 @@ h1 {
     text-align: center;
 }
 
+#photosContainer p {
+    text-align: center;
+    color: #999;
+}
+
+/* Navigační položky - skryté podle role */
+#navAddTrip,
+#calendarBtn {
+    display: none;
+}
+
+/* Skryté sekce */
+#uploadSection,
+#uploadPreview,
+#uploadDisabled,
+#lightbox {
+    display: none;
+}
+
+/* Skrytý file input */
+#fileInput {
+    display: none;
+}
+
 .btn-back {
     background: none;
     border: 1px solid #007bff;
@@ -189,7 +213,6 @@ h1 {
     font-size: 14px;
 }
 
-/* Photos grid */
 .photos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -256,7 +279,6 @@ h1 {
     font-size: 15px;
 }
 
-/* Lightbox */
 .lightbox {
     position: fixed;
     top: 0;

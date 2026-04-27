@@ -62,11 +62,15 @@ form input[type="file"]:hover {
 #obrazekPreview {
     text-align: center;
     margin-bottom: 15px;
+    margin-top: 10px;
 }
 
+#obrazekPreview img,
 #previewImg {
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 300px;
+    max-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 form select {
@@ -141,6 +145,36 @@ form button[type="submit"]:hover {
 form iframe {
     border-radius: 10px;
     margin-top: 10px;
+    border: 1px solid black;
+}
+
+/* strava info */
+#stravaInfo {
+    text-align: center;
+    color: #888;
+}
+
+/* obrázky - náhled a současný */
+#obrazekPreview,
+#obrazekCurrent {
+    margin-top: 10px;
+}
+
+#obrazekPreview p,
+#obrazekCurrent p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+#obrazekPreview img,
+#obrazekCurrent img,
+#previewImg,
+#currentImg {
+    max-width: 300px;
+    max-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 /* address container */
@@ -239,7 +273,7 @@ form iframe {
     background-color: #5a6268 !important;
 }
 
-/* Teacher multi-select */
+/* multi-select učitelů */
 .teacher-select-wrapper {
     margin-bottom: 15px;
 }
@@ -320,7 +354,7 @@ form textarea:focus {
     display: block;
 }
 
-/* Krok dokon\u010den (zaelen\u00fd \u010dek) */
+/* Krok dokončen */
 .step-tab.done {
     color: #28a745;
 }
@@ -329,7 +363,7 @@ form textarea:focus {
     font-weight: 700;
 }
 
-/* Submit tla\u010d\u00edtko disabled stav */
+/* Tlačítko odeslání ve vypnutém (disabled) stavu */
 form button[type="submit"]:disabled {
     background-color: #94d497;
     cursor: not-allowed;

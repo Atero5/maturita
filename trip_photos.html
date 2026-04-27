@@ -12,10 +12,10 @@
     <nav class="navbar">
         <div class="logo"><a href="#" id="logo-link" class="no-style-link">VÝLETOS</a></div>
         <ul class="menu" id="navMenu">
-            <li id="navAddTrip" style="display:none"><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
+            <li id="navAddTrip"><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
             <li><button type="button">Výlety</button></li>
             <li><button type="button" onclick="window.location.href='gallery.html'">Fotogalerie</button></li>
-            <li id="calendarBtn" style="display:none"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
+            <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
             <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
                 <div id="userDropdown" class="dropdown hidden">
@@ -31,14 +31,14 @@
             <button class="btn-back" onclick="window.history.back()">&larr; Zpět</button>
             <h1 id="pageTitle">Fotky z výletu</h1>
             <hr>
-            <div id="uploadSection" style="display:none;">
+            <div id="uploadSection">
                 <div class="upload-area" id="uploadArea">
-                    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">
+                    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
                     <button class="btn-upload" onclick="document.getElementById('fileInput').click()">📷 Vybrat fotky</button>
                     <span class="upload-hint">JPG, PNG, WEBP – max 10 MB / fotka</span>
                     <span class="upload-drag-hint">nebo přetáhněte fotky sem</span>
                 </div>
-                <div id="uploadPreview" style="display:none;">
+                <div id="uploadPreview">
                     <div id="previewGrid" class="preview-grid"></div>
                     <div class="preview-actions">
                         <button class="btn-confirm-upload" onclick="confirmUpload()">Nahrát všechny</button>
@@ -48,20 +48,20 @@
                 <div id="uploadStatus"></div>
             </div>
 
-            <div id="uploadDisabled" style="display:none;">
+            <div id="uploadDisabled">
                 <p class="info-text">Fotky bude možné přidat po návratu z výletu.</p>
             </div>
 
             
 
             <div id="photosContainer">
-                <p style="text-align:center; color:#999;">Načítání...</p>
+                <p>Načítání...</p>
             </div>
         </section>
     </main>
 
     <!-- Lightbox -->
-    <div id="lightbox" class="lightbox" style="display:none;" onclick="closeLightbox(event)">
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <button class="lightbox-arrow lightbox-prev" id="lightboxPrev" onclick="event.stopPropagation(); lightboxStep(-1)">&#8249;</button>
         <img id="lightboxImg" src="" alt="Fotka">

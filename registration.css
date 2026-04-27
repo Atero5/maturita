@@ -37,8 +37,15 @@
 .btn_back{
     width: 75px;
     background-color: #3498db;
-    
 }
+
+/* Hidden form fields - shown based on role selection */
+#classField,
+#parentEmailField {
+    display: none;
+}
+    
+
 
 .btn_back:hover{
     background-color: #2980b9;

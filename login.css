@@ -41,3 +41,7 @@
     text-decoration: none;
     
 }
+
+.success-message {
+    display: none;
+}

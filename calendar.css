@@ -29,6 +29,12 @@ body {
     margin: 0 0 10px 0;
 }
 
+/* Načítání text */
+#calendarWidget p {
+    text-align: center;
+    color: #999;
+}
+
 .white-box hr {
     border: none;
     border-top: 2px solid #3498db;
