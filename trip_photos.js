@@ -72,7 +72,7 @@ async function loadPhotos() {
             document.getElementById('uploadDisabled').style.display = 'none';
         }
 
-        // Název výletu - načte z api_trips
+        // Název výletu - načteme z api_trips
         try {
             const tripRes = await fetch('api_trips.php?id=' + tripId);
             const tripData = await tripRes.json();

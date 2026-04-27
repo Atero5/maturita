@@ -9,7 +9,7 @@ function loadTeachers(myEmail) {
             const dropdown = document.getElementById('teacherDropdown');
             if (data.teachers) {
                 data.teachers.forEach(t => {
-                    if (t.email === myEmail) return;
+                    if (t.email === myEmail) return; // přeskočit sebe
                     const opt = document.createElement('option');
                     opt.value = t.email;
                     opt.textContent = t.email;
@@ -129,7 +129,7 @@ function zobrazMapu() {
             let mapa = document.getElementById("mapa");
             mapa.src = url;
 
-           
+            // 👇 zobrazí mapu
             mapa.classList.remove("hidden");
         }
 
@@ -191,7 +191,7 @@ function validateAndGoToStep(from, to) {
     goToStep(to);
 }
 
-// Kliknutí na lištu kroků 
+// Kliknutí na lištu kroků (pouze zpět nebo na done krok)
 document.querySelectorAll('.step-tab').forEach(tab => {
     tab.addEventListener('click', function() {
         const target = parseInt(this.dataset.step);
@@ -444,9 +444,11 @@ fetch('api_auth.php')
             loadTeachers(data.email);
             renderSelectedTeachers();
             document.body.style.visibility = 'visible';
+            // Nastavit minimální datum na dnešek
             const nowStr = new Date().toISOString().slice(0, 16);
             document.querySelector('input[name="cas_odjezdu_tam"]').min = nowStr;
             document.querySelector('input[name="cas_odjezdu_zpet"]').min = nowStr;
+            // Aktualizovat min zpět při změně tam
             document.querySelector('input[name="cas_odjezdu_tam"]').addEventListener('change', function() {
                 if (this.value) {
                     document.querySelector('input[name="cas_odjezdu_zpet"]').min = this.value;

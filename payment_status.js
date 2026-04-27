@@ -77,7 +77,7 @@ async function togglePayment(event) {
     const userId = parseInt(checkbox.dataset.userId);
     const zaplaceno = checkbox.checked ? 1 : 0;
     
-    
+    // Najdi tripId - musí být dostupný z globální scope (z trip_detail.js)
     const urlParams = new URLSearchParams(window.location.search);
     const tripId = parseInt(urlParams.get('id'));
     

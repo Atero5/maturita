@@ -15,10 +15,10 @@
     <nav class="navbar">
         <div class="logo"><a href="#" id="logo-link" class="no-style-link">VÝLETOS</a></div>
         <ul class="menu" id="navMenu">
-            <li id="navAddTrip"><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
+            <li id="navAddTrip" style="display:none"><button type="button" onclick="window.location.href='add_trip.html'">Přidat výlet</button></li>
             <li><button type="button">Výlety</button></li>
             <li><button type="button" onclick="window.location.href='gallery.html'" class="active-nav">Fotogalerie</button></li>
-            <li id="calendarBtn"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
+            <li id="calendarBtn" style="display:none"><button type="button" onclick="window.location.href='calendar.html'">Kalendář</button></li>
             <li class="user-menu">
                 <button type="button" onclick="toggleMenu()">Profil</button>
                 <div id="userDropdown" class="dropdown hidden">
@@ -38,7 +38,7 @@
             </div>
             
             <div id="tripsContainer">
-                <p>Načítání...</p>
+                <p style="text-align:center; color:#999;">Načítání...</p>
             </div>
         </section>
     </main>

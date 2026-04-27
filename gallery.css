@@ -19,24 +19,8 @@ body {
     min-height: 200px;
 }
 
-.white-box h1 {
+h1 {
     text-align: center;
-}
-
-.white-box hr {
-    margin-bottom: 20px;
-}
-
-/* Načítání text */
-#tripsContainer p {
-    text-align: center;
-    color: #999;
-}
-
-/* Navigační položky - skryté podle role */
-#navAddTrip,
-#calendarBtn {
-    display: none;
 }
 
 .search-container {
