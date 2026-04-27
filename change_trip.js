@@ -383,7 +383,6 @@ async function loadTripData() {
         // Harmonogram
         document.querySelector('textarea[name="harmonogram"]').value = trip.harmonogram || '';
 
-        // Učitelé - rozparsovat a naplnit
         if (trip.uciitele) {
             const teachers = trip.uciitele.split(',').map(e => e.trim()).filter(e => e && e !== currentUserEmail);
             selectedTeachersList.length = 0;

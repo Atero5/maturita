@@ -59,7 +59,7 @@ async function setupNavbar() {
             }
         }
     } catch (error) {
-        // If error, keep buttons hidden
+
     }
 }
 

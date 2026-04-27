@@ -85,7 +85,7 @@ function renderCalendar(date) {
         <div class="calendar-weekdays">
     `;
     
-    // Těsty dní v týdnu
+    // Testy dní v týdnu
     weekdayNames.forEach(day => {
         html += `<div class="calendar-weekday">${day}</div>`;
     });

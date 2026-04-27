@@ -95,7 +95,7 @@ form h2 {
     text-align: center;
     margin-top: 30px;
     padding-bottom: 5px;
-    border-bottom: 2px solid black; /* čára */
+    border-bottom: 2px solid black;
 }
 
 form h3 {
@@ -320,7 +320,7 @@ form textarea:focus {
     display: block;
 }
 
-/* Krok dokon\u010den (zaelen\u00fd \u010dek) */
+/* Krok dokončen (zelený check) */
 .step-tab.done {
     color: #28a745;
 }
@@ -329,7 +329,7 @@ form textarea:focus {
     font-weight: 700;
 }
 
-/* Submit tla\u010d\u00edtko disabled stav */
+/* Tlačítko odeslání ve vypnutém (disabled) stavu */
 form button[type="submit"]:disabled {
     background-color: #94d497;
     cursor: not-allowed;
