@@ -2,50 +2,55 @@
 session_start();
 header('Content-Type: application/json');
 
-// Load environment variables
+// Načte hesla a údaje z .env souboru
 $env = parse_ini_file(__DIR__ . '/.env');
 
-// 1. Ochrana – jen přihlášený admin
+// Ochrana – přístup mají pouze přihlášení admini
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    http_response_code(403); // Zakázaný přístup
+    http_response_code(403);
     echo json_encode(['error' => 'Nepovolený přístup']);
     exit();
 }
 
+// Připojí se k databázi
 $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 if ($conn->connect_error) {
     echo json_encode(['error' => 'Chyba připojení k DB']);
     exit();
 }
 
-// 2. Načtení dat o adminovi a seznamu uživatelů
+// Načte e-mail přihlášeného admina a připraví pole uživatelů
 $admin_email = $_SESSION['email'];
 $users = [];
 
-// Pagination parameters
+// Parametry stránkování
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 15;
 $offset = ($page - 1) * $limit;
 
-// Get paginated users
+// Vyhledávání podle e-mailu (volitelné)
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$where = "role != 'admin'";
-if ($search !== '') {
-    $where .= " AND email LIKE '%" . $conn->real_escape_string($search) . "%'";
-}
+$searchParam = '%' . $search . '%';
 
-// Total with filters
-$total_result = $conn->query("SELECT COUNT(*) as total FROM " . $env['USER_TABLE'] . " WHERE $where");
-$total_users = $total_result->fetch_assoc()['total'];
+// Celkový počet (pro stránkování)
+$stmtTotal = $conn->prepare("SELECT COUNT(*) as total FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' AND email LIKE ?");
+$stmtTotal->bind_param('s', $searchParam);
+$stmtTotal->execute();
+$total_users = $stmtTotal->get_result()->fetch_assoc()['total'];
+$stmtTotal->close();
 
-// Paginated with filters
-$result = $conn->query("SELECT userId, email, class, role FROM " . $env['USER_TABLE'] . " WHERE $where LIMIT $limit OFFSET $offset");
+// Načte uživatele pro aktuální stránku
+$stmtUsers = $conn->prepare("SELECT userId, email, class, role FROM " . $env['USER_TABLE'] . " WHERE role != 'admin' AND email LIKE ? LIMIT ? OFFSET ?");
+$stmtUsers->bind_param('sii', $searchParam, $limit, $offset);
+$stmtUsers->execute();
+$result = $stmtUsers->get_result();
 while($row = $result->fetch_assoc()) {
     $users[] = $row;
 }
+$stmtUsers->close();
 
 
-// 3. Odeslání dat do HTML
+// Pošle seznam uživatelů a data pro stránkování jako JSON
 echo json_encode([
     'admin_email' => $admin_email,
     'users' => $users,

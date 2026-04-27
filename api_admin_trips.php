@@ -2,17 +2,17 @@
 session_start();
 header('Content-Type: application/json');
 
-// Load environment variables
+// Načte hesla a údaje z .env souboru
 $env = parse_ini_file(__DIR__ . '/.env');
 
-// 1. Ochrana – jen přihlášený admin
+// Ochrana – přístup mají pouze přihlášení admini
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(['error' => 'Nepovolený přístup']);
     exit();
 }
 
-// 2. Připojení k databázi
+// Připojí se k databázi
 $conn = new mysqli($env['DB_HOSTNAME'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
 $conn->set_charset("utf8mb4");
 
@@ -27,7 +27,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 // ========== GET – načtení výletů ==========
 if ($method === 'GET') {
 
-    // Detail jednoho výletu
+    // Pokud je zadáno ?id=N, vrátí detail jednoho výletu
     if (isset($_GET['id'])) {
         $id = (int)$_GET['id'];
         $stmt = $conn->prepare("SELECT vyletId, nazev_vyletu, nahledovy_obrazek, adresa_ubytovani, delka_pobytu, celkova_cena, cislo_uctu, misto_odjezdu_tam, cas_odjezdu_tam, dopravni_prostredek_tam, misto_odjezdu_zpet, cas_odjezdu_zpet, dopravni_prostredek_zpet, harmonogram, uciitele FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
@@ -64,12 +64,12 @@ if ($method === 'GET') {
         exit();
     }
 
-    // Seznam všech výletů s paginací
+    // Bez ID vrátí seznam všech výletů se stránkováním
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = 15;
     $offset = ($page - 1) * $limit;
 
-    // Celkový počet
+    // Zjistí celkový počet výletů pro stránkování
     $total_result = $conn->query("SELECT COUNT(*) as total FROM " . $env['TRIPS_TABLE']);
     if (!$total_result) {
         echo json_encode(['success' => false, 'message' => 'Chyba DB: ' . $conn->error]);
@@ -78,7 +78,7 @@ if ($method === 'GET') {
     }
     $total = $total_result->fetch_assoc()['total'];
 
-    // Výlety s třídami
+    // Načte výlety včetně přiřazených tříd (GROUP_CONCAT spojí třídy do jednoho stringu)
     $query = "SELECT v.vyletId, v.nazev_vyletu, v.delka_pobytu, v.celkova_cena, v.misto_odjezdu_tam,
               GROUP_CONCAT(vt.tridy ORDER BY vt.tridy SEPARATOR ', ') as tridy
               FROM " . $env['TRIPS_TABLE'] . " v
@@ -150,7 +150,7 @@ elseif ($method === 'DELETE') {
         exit();
     }
 
-    // Smažání výletu (CASCADE smaže i TRIPS_CLASSES_TABLE a PHOTOS_TABLE)
+    // Smaže výlet (CASCADE automaticky smaže i třídy, fotky a platby)
     $stmt = $conn->prepare("DELETE FROM " . $env['TRIPS_TABLE'] . " WHERE vyletId = ?");
     $stmt->bind_param("i", $id);
 
@@ -158,42 +158,6 @@ elseif ($method === 'DELETE') {
         echo json_encode(['success' => true, 'message' => 'Výlet smazán']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Chyba při mazání']);
-    }
-    $stmt->close();
-}
-
-// ========== PUT – úprava výletu ==========
-elseif ($method === 'PUT') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $id = isset($input['id']) ? (int)$input['id'] : 0;
-
-    if ($id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Neplatné ID']);
-        $conn->close();
-        exit();
-    }
-
-    $nazev = $input['nazev'] ?? '';
-    $adresa = $input['adresa'] ?? '';
-    $delka = $input['delka_pobytu'] ?? '';
-    $misto = $input['misto'] ?? '';
-    $cas = $input['cas'] ?? '';
-    $doprava = $input['doprava'] ?? '';
-    $misto_zpet = $input['misto_zpet'] ?? '';
-    $cas_zpet = $input['cas_zpet'] ?? '';
-    $doprava_zpet = $input['doprava_zpet'] ?? '';
-    $harmonogram = $input['harmonogram'] ?? '';
-    $ucitele = $input['ucitele'] ?? '';
-    $cena = !empty($input['cena']) ? $input['cena'] : 0;
-    $cislo_uctu = $input['cislo_uctu'] ?? '';
-
-    $stmt = $conn->prepare("UPDATE " . $env['TRIPS_TABLE'] . " SET nazev_vyletu = ?, adresa_ubytovani = ?, delka_pobytu = ?, misto_odjezdu_tam = ?, cas_odjezdu_tam = ?, dopravni_prostredek_tam = ?, misto_odjezdu_zpet = ?, cas_odjezdu_zpet = ?, dopravni_prostredek_zpet = ?, harmonogram = ?, uciitele = ?, celkova_cena = ?, cislo_uctu = ? WHERE vyletId = ?");
-    $stmt->bind_param("sssssssssssdsi", $nazev, $adresa, $delka, $misto, $cas, $doprava, $misto_zpet, $cas_zpet, $doprava_zpet, $harmonogram, $ucitele, $cena, $cislo_uctu, $id);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Výlet upraven']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Chyba při úpravě']);
     }
     $stmt->close();
 }

@@ -382,17 +382,11 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// 4. Odeslání dat
+// Pošle data jako JSON
 echo json_encode([
     'success' => true,
     'trips' => $trips,
-    'count' => count($trips),
-    'debug' => [
-        'role' => $_SESSION['role'],
-        'user_id' => $_SESSION['user_id'] ?? null,
-        'email' => $_SESSION['email'] ?? null,
-        'class' => $_SESSION['class'] ?? null
-    ]
+    'count' => count($trips)
 ]);
 
 $conn->close();
